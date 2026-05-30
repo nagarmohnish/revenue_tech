@@ -3,16 +3,12 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>AgentMint - Monetization infrastructure for AI agents</title>
-<meta name="description" content="The payments, credits and subscriptions stack for AI agents. Plug in behind two SDK calls and start collecting revenue from every agent you ship." />
-<meta property="og:title" content="AgentMint - Monetize all your AI agents from one place" />
-<meta property="og:description" content="Plug in behind two SDK calls and start collecting revenue from every agent you ship." />
-<meta property="og:type" content="website" />
-<meta name="twitter:card" content="summary_large_image" />
+<title>AgentMint · Billing for AI agents</title>
+<meta name="description" content="One credit wallet. Two HTTP calls. Every agent you ship, in one place." />
 
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
 
 <script src="https://cdn.tailwindcss.com"></script>
 <script>
@@ -20,624 +16,618 @@
     theme: {
       extend: {
         colors: {
-          brand: { 50:'#e8f9f0',100:'#c8f0dc',200:'#92e3bd',300:'#5cd49d',400:'#2bbd7e',500:'#10a868',600:'#0a8a55',700:'#0a6e45',800:'#0b5638',900:'#0a3f2a' },
-          ink:   { 950:'#06221a',900:'#0a2b21',800:'#10392c',700:'#1d4b3c',600:'#3d6557',500:'#618376',400:'#93aaa0',300:'#c2d2cb',200:'#e2ebe6',100:'#eef4f1',50:'#f5faf7' },
-          coral: { 400:'#ff8a5c',500:'#f2683c',600:'#dc4f23' }
+          brand: { 50:'#e8f9f0', 100:'#c8f0dc', 200:'#92e3bd', 300:'#5cd49d', 400:'#2bbd7e', 500:'#10a868', 600:'#0a8a55', 700:'#0a6e45', 800:'#0b5638', 900:'#0a3f2a' },
+          ink:   { 50:'#f5faf7', 100:'#eef4f1', 200:'#e2ebe6', 300:'#c2d2cb', 400:'#93aaa0', 500:'#618376', 600:'#3d6557', 700:'#1d4b3c', 800:'#10392c', 900:'#0a2b21', 950:'#06221a' },
+          coral: { 400:'#ff8a5c', 500:'#f2683c', 600:'#dc4f23' },
         },
         fontFamily: {
           sans: ['Plus Jakarta Sans','ui-sans-serif','system-ui','sans-serif'],
-          mono: ['JetBrains Mono','ui-monospace','monospace']
+          mono: ['JetBrains Mono','ui-monospace','monospace'],
         }
       }
     }
   }
 </script>
+
 <style>
-  html{scroll-behavior:smooth;}
-  body{font-family:'Plus Jakarta Sans',system-ui,sans-serif; color:#06221a; background:#fff; -webkit-font-smoothing:antialiased;}
-  :target{scroll-margin-top:6rem;}
-  ::selection{background:#c8f0dc; color:#0a6e45;}
-  .mono{font-family:'JetBrains Mono',monospace;}
-  .tnum{font-variant-numeric:tabular-nums;}
-  .wrap{max-width:75rem; margin-inline:auto; padding-inline:1.5rem;}
-  .h1{font-size:clamp(2.6rem,6vw,4.6rem); line-height:1.02; letter-spacing:-.03em; font-weight:800;}
-  .h2{font-size:clamp(1.9rem,3.8vw,3rem); line-height:1.06; letter-spacing:-.025em; font-weight:800;}
-  .lead{font-size:1.18rem; line-height:1.6; color:#3d6557;}
-  .balance{text-wrap:balance;}
+  body { font-family:'Plus Jakarta Sans',system-ui,sans-serif; color:#06221a; background:#fff; -webkit-font-smoothing:antialiased; }
+  .mono { font-family:'JetBrains Mono', monospace; }
+  .tnum { font-variant-numeric: tabular-nums; }
 
-  /* buttons */
-  .btn{display:inline-flex; align-items:center; gap:.5rem; font-weight:700; font-size:.95rem; padding:.8rem 1.35rem; border-radius:11px; text-decoration:none; transition:.16s; border:2px solid transparent; cursor:pointer;}
-  .btn-green{background:#10a868; color:#fff; box-shadow:0 10px 24px -10px rgba(16,168,104,.6);}
-  .btn-green:hover{background:#0a8a55; transform:translateY(-1px);}
-  .btn-ink{background:#06221a; color:#fff;}
-  .btn-ink:hover{background:#10392c;}
-  .btn-line{background:#fff; color:#06221a; border-color:#dbe7e1;}
-  .btn-line:hover{border-color:#10a868; color:#0a6e45;}
-  .btn-white{background:#fff; color:#0a6e45;}
-  .btn-white:hover{background:#eef4f1;}
+  .wrap { max-width: 75rem; margin-inline: auto; padding-inline: 1.5rem; }
+  .h1 { font-size: clamp(2.6rem, 6vw, 4.6rem); line-height: 1.02; letter-spacing: -0.03em; font-weight: 800; }
+  .h2 { font-size: clamp(1.9rem, 3.8vw, 3rem); line-height: 1.06; letter-spacing: -0.025em; font-weight: 800; }
+  .lead { font-size: 1.18rem; line-height: 1.6; color: #3d6557; }
+  .balance { text-wrap: balance; }
 
-  /* pills / chips */
-  .chip{display:inline-flex; align-items:center; gap:.5rem; font-size:.8rem; font-weight:600; padding:.35rem .8rem; border-radius:999px; background:#e8f9f0; color:#0a6e45; border:1px solid #c8f0dc;}
-  .dot{width:.5rem; height:.5rem; border-radius:999px; background:currentColor;}
-  @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.75)}}
-  .pulse{animation:pulse 1.6s ease-in-out infinite;}
+  .eyebrow { display:inline-flex; align-items:center; gap:.5rem; font-size:.72rem; letter-spacing:.14em; text-transform:uppercase; font-weight:800; color:#0a8a55; }
+  .eyebrow.justify-center { justify-content:center; }
 
-  .card{background:#fff; border:1px solid #e2ebe6; border-radius:18px; box-shadow:0 1px 2px rgba(6,34,26,.04);}
-  .card-pop{box-shadow:0 30px 60px -28px rgba(6,34,26,.28);}
+  .card { background:#fff; border:1px solid #e2ebe6; border-radius:1rem; box-shadow:0 1px 0 rgba(6,34,26,.02), 0 12px 32px -22px rgba(6,34,26,.15); }
 
-  /* eyebrow */
-  .eyebrow{display:inline-flex; align-items:center; gap:.5rem; font-size:.78rem; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:#0a8a55;}
+  .chip { display:inline-flex; align-items:center; gap:.4rem; font-size:.78rem; font-weight:600; padding:.32rem .65rem; border-radius:999px; background:#fff; border:1px solid #e2ebe6; color:#1d4b3c; }
+  .dot { width:.45rem; height:.45rem; border-radius:999px; display:inline-block; }
 
-  section{scroll-margin-top:6rem;}
+  @keyframes pulseDot { 0%,100% { opacity:1; transform:scale(1); } 50% { opacity:.4; transform:scale(.75); } }
+  .dot-pulse { animation: pulseDot 1.6s ease-in-out infinite; }
 
-  /* reveal */
-  .reveal{opacity:0; transform:translateY(16px); transition:opacity .6s cubic-bezier(.22,.61,.36,1), transform .6s cubic-bezier(.22,.61,.36,1);}
-  .reveal.in{opacity:1; transform:none;}
+  .reveal { opacity:0; transform: translateY(14px); transition: opacity .55s ease, transform .55s ease; }
+  .reveal.in { opacity:1; transform:none; }
 
-  /* marquee */
-  .marquee{display:flex; gap:1rem; width:max-content; animation:scrollx 26s linear infinite;}
-  @keyframes scrollx{to{transform:translateX(-50%)}}
-  .marquee-mask{-webkit-mask-image:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent); mask-image:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent);}
+  @keyframes feedFlash { 0% { background: rgba(16,168,104,.16); } 100% { background: transparent; } }
+  .feed-flash { animation: feedFlash .7s ease-out; }
 
-  /* hero pipeline */
-  .track{position:relative; height:3px; background:#e2ebe6; border-radius:999px; overflow:hidden;}
-  .track > i{position:absolute; inset:0; width:0; background:linear-gradient(90deg,#2bbd7e,#10a868); border-radius:999px;}
-  @keyframes runline{0%{width:0}45%{width:100%}55%{width:100%}100%{width:0}}
-  .token{position:absolute; top:50%; width:14px; height:14px; margin-top:-7px; border-radius:999px; background:#10a868; box-shadow:0 0 0 4px rgba(16,168,104,.18);}
-  @keyframes runtoken{0%{left:0}45%{left:calc(100% - 14px)}55%{left:calc(100% - 14px)}100%{left:0}}
+  .pipeline-track { position:relative; height:3px; background:#eef4f1; border-radius:999px; overflow:hidden; }
+  .pipeline-track::after { content:''; position:absolute; inset:0; background: linear-gradient(90deg, transparent, #10a868, transparent); animation: pipelineSweep 1.4s linear infinite; }
+  @keyframes pipelineSweep { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
 
-  .step-badge{transition:.3s;}
-  @keyframes feedIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
-  .feed-flash{animation:feedIn .5s ease-out;}
+  .hero-bg {
+    background:
+      radial-gradient(60% 50% at 100% 0%, rgba(146,227,189,.35) 0%, transparent 60%),
+      radial-gradient(40% 40% at 0% 100%, rgba(200,240,220,.45) 0%, transparent 60%);
+  }
 
-  /* blob bg */
-  .blob{position:absolute; border-radius:50%; filter:blur(50px); opacity:.5; pointer-events:none;}
+  .phase-active { background:#10a868; color:#fff; border-color:#10a868; box-shadow: 0 6px 18px -6px rgba(16,168,104,.7); }
+  .phase-idle   { background:#fff; color:#618376; border-color:#e2ebe6; }
 
-  /* nav */
-  .nav{transition:.2s; border-bottom:1px solid transparent;}
-  .nav.scrolled{background:rgba(255,255,255,.86); backdrop-filter:blur(12px); border-bottom-color:#e2ebe6;}
+  /* Mega-menu */
+  .megapanel { display:none; }
+  .megapanel.open { display:block; }
+  .nav-trigger .chev { transition: transform .2s ease; display:inline-block; }
+  .nav-trigger[aria-expanded="true"] .chev { transform: rotate(180deg); }
+  .nav-trigger[aria-expanded="true"] { color:#06221a; }
 
-  @media (prefers-reduced-motion: reduce){
-    .reveal{opacity:1!important;transform:none!important;transition:none}
-    .pulse,.marquee,.track>i,.token,.feed-flash{animation:none}
-    html{scroll-behavior:auto}
+  @media (prefers-reduced-motion: reduce) {
+    .reveal { opacity:1; transform:none; transition:none; }
+    .dot-pulse, .pipeline-track::after { animation:none; }
   }
 </style>
 </head>
-<body>
+<body class="min-h-screen">
 
-<!-- ANNOUNCEMENT BAR -->
-<div class="bg-ink-950 text-white text-center text-[.84rem] py-2.5 px-4">
-  <span class="text-brand-300 font-semibold">New</span>
-  <span class="text-ink-100">·  Open for indie devs, startups and companies building AI agents.</span>
-  <a href="/build/signup" class="text-white font-semibold underline underline-offset-4 decoration-brand-400 ml-1">Start building →</a>
-</div>
-
-<!-- NAV -->
-<header id="nav" class="nav sticky top-0 z-40">
-  <div class="wrap h-16 flex items-center justify-between">
-    <a href="#top" class="flex items-center gap-2.5 font-extrabold text-[1.1rem] tracking-tight">
-      <svg width="28" height="28" viewBox="0 0 28 28" fill="none" aria-hidden="true">
-        <rect x="2" y="2" width="24" height="24" rx="7" fill="#10a868"/>
-        <circle cx="14" cy="14" r="6" stroke="#fff" stroke-width="1.9" fill="none"/>
-        <path d="M14 10.2v7.6M11.6 12.6h4.8M11.6 15.4h4.8" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/>
-      </svg>
-      Agent<span class="text-brand-500">Mint</span>
-    </a>
-    <nav class="hidden md:flex items-center gap-7 text-[.92rem] font-medium text-ink-700">
-      <a href="#stack" class="hover:text-ink-950">Any stack</a>
-      <a href="#how" class="hover:text-ink-950">How it works</a>
-      <a href="#features" class="hover:text-ink-950">Features</a>
-      <a href="#pricing" class="hover:text-ink-950">Pricing</a>
-      <a href="#faq" class="hover:text-ink-950">FAQ</a>
-    </nav>
-    <div class="flex items-center gap-3">
-      <a href="#" class="hidden sm:inline text-[.92rem] font-medium text-ink-700 hover:text-ink-950">Sign in</a>
-      <a href="/build/signup" class="btn btn-green !py-2.5 !px-4 !text-[.9rem]">Start building</a>
-    </div>
-  </div>
-</header>
-
-<main id="top">
-
-<!-- HERO -->
-<section class="relative overflow-hidden">
-  <div class="blob" style="width:34rem;height:34rem;background:#92e3bd;top:-12rem;right:-8rem;"></div>
-  <div class="blob" style="width:26rem;height:26rem;background:#c8f0dc;bottom:-10rem;left:-6rem;opacity:.6;"></div>
-  <div class="relative wrap pt-16 pb-20 md:pt-20 md:pb-24">
-    <div class="grid lg:grid-cols-2 gap-x-12 gap-y-14 items-center">
-
-      <!-- copy -->
-      <div>
-        <div class="reveal chip"><span class="dot pulse bg-brand-500"></span> India-first · indie devs, startups &amp; small studios</div>
-        <h1 class="reveal h1 balance mt-5">
-          One wallet for your<br>
-          <span id="rotor" class="text-brand-500">writer agent</span>.<br>
-          And every one after that.
-        </h1>
-        <p class="reveal lead mt-6 max-w-xl">
-          AgentMint is the credits + plan gating + billing-portal layer for AI agents. Your customer buys credits once and spends them across your whole suite. Two HTTP calls per agent, ~30 minutes to instrument. USD via Stripe Connect now - INR via Razorpay/UPI is next.
-        </p>
-        <div class="reveal mt-8 flex flex-wrap gap-3">
-          <a href="/build/signup" class="btn btn-green">
-            Start building - it's free
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-          </a>
-          <a href="#how" class="btn btn-line">See how it works</a>
-        </div>
-        <div class="reveal mt-7 flex flex-wrap items-center gap-x-6 gap-y-2 text-[.85rem] font-medium text-ink-600">
-          <span class="flex items-center gap-2"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#10a868" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> One wallet for the whole suite</span>
-          <span class="flex items-center gap-2"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#10a868" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Two HTTP calls</span>
-          <span class="flex items-center gap-2"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#10a868" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> USD now · INR/UPI/GST next</span>
-        </div>
-      </div>
-
-      <!-- animated product card -->
-      <div class="reveal">
-        <div class="card card-pop p-6 relative">
-          <div class="flex items-center justify-between">
-            <div class="flex items-center gap-2 text-[.78rem] font-semibold text-ink-500 uppercase tracking-wider">
-              <span class="dot pulse bg-brand-500"></span> Request pipeline
-            </div>
-            <span class="mono text-[.74rem] text-ink-400">workspace_ac82</span>
-          </div>
-
-          <!-- pipeline -->
-          <div class="mt-5 grid grid-cols-3 gap-2 text-center">
-            <div><div id="b1" class="step-badge mono text-[.72rem] font-semibold px-2 py-1.5 rounded-lg bg-brand-50 text-brand-700">authorize()</div></div>
-            <div><div id="b2" class="step-badge mono text-[.72rem] font-semibold px-2 py-1.5 rounded-lg bg-ink-100 text-ink-500">run agent</div></div>
-            <div><div id="b3" class="step-badge mono text-[.72rem] font-semibold px-2 py-1.5 rounded-lg bg-ink-100 text-ink-500">debit()</div></div>
-          </div>
-          <div class="track mt-4"><i style="animation:runline 4s ease-in-out infinite;"></i><span class="token" style="animation:runtoken 4s ease-in-out infinite;"></span></div>
-
-          <!-- balance -->
-          <div class="mt-6 rounded-2xl border border-ink-100 p-4 bg-ink-50">
-            <div class="flex items-center justify-between text-[.78rem] text-ink-500 font-medium">
-              <span>Customer balance</span>
-              <span class="chip !py-0.5 !px-2 !text-[.72rem]"><span class="dot bg-brand-500"></span>Growth · 2,500/mo</span>
-            </div>
-            <div class="mt-1.5 flex items-end gap-2">
-              <span id="bal" class="text-[2.4rem] leading-none font-extrabold tnum text-ink-950">1,847</span>
-              <span class="text-ink-500 pb-1 font-medium">credits</span>
-              <span class="ml-auto text-[.78rem] text-ink-400 pb-1 tnum">~23 days left</span>
-            </div>
-            <div class="mt-3 h-2 rounded-full bg-ink-200 overflow-hidden"><div id="balbar" class="h-full bg-brand-500 transition-all duration-500" style="width:73%"></div></div>
-          </div>
-
-          <!-- live feed -->
-          <div class="mt-4">
-            <div class="text-[.74rem] font-semibold text-ink-500 uppercase tracking-wider mb-2">Live agent calls</div>
-            <ul id="feed" class="space-y-1.5 text-[.84rem]">
-              <li class="flex items-center justify-between"><span class="mono text-ink-700 truncate">analyzer · score_page</span><span class="flex items-center gap-2.5 text-ink-400 tnum"><span class="text-coral-500 font-semibold">−30</span><span class="w-8 text-right">12s</span></span></li>
-              <li class="flex items-center justify-between"><span class="mono text-ink-700 truncate">writer · generate_doc</span><span class="flex items-center gap-2.5 text-ink-400 tnum"><span class="text-coral-500 font-semibold">−45</span><span class="w-8 text-right">48s</span></span></li>
-              <li class="flex items-center justify-between"><span class="mono text-ink-700 truncate">generator · create_post</span><span class="flex items-center gap-2.5 text-ink-400 tnum"><span class="text-coral-500 font-semibold">−2</span><span class="w-8 text-right">1m</span></span></li>
-            </ul>
-          </div>
-        </div>
-      </div>
-
-    </div>
-  </div>
-</section>
-
-<!-- STATS BAND -->
-<section class="bg-ink-950 text-white">
-  <div class="wrap py-14 md:py-16">
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-y-10 gap-x-6 reveal">
-      <div class="text-center md:border-r border-ink-800">
-        <div class="counter h2 text-brand-300 tnum" data-to="1248903">0</div>
-        <div class="mt-2 text-[.86rem] text-ink-300 font-medium">Credits authorized</div>
-      </div>
-      <div class="text-center md:border-r border-ink-800">
-        <div class="counter h2 text-brand-300 tnum" data-to="47" data-suffix="ms">0</div>
-        <div class="mt-2 text-[.86rem] text-ink-300 font-medium">p99 authorize() latency</div>
-      </div>
-      <div class="text-center md:border-r border-ink-800">
-        <div class="counter h2 text-brand-300 tnum" data-to="6">0</div>
-        <div class="mt-2 text-[.86rem] text-ink-300 font-medium">Live agents in production</div>
-      </div>
-      <div class="text-center">
-        <div class="counter h2 text-brand-300 tnum" data-to="99.99" data-decimals="2" data-suffix="%">0</div>
-        <div class="mt-2 text-[.86rem] text-ink-300 font-medium">Atomic debit accuracy</div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ANY STACK -->
-<section id="stack" class="bg-brand-50/60 border-y border-ink-100">
-  <div class="wrap py-16 md:py-20">
-    <div class="text-center max-w-2xl mx-auto reveal">
-      <div class="eyebrow justify-center">Any agent, any stack</div>
-      <h2 class="h2 balance mt-4">If it speaks HTTPS, it bills through AgentMint.</h2>
-      <p class="lead mt-4">No SDK lock-in, no preferred framework. The contract is four fields - <span class="mono text-ink-800 text-[.95em]">workspace_id · product_id · action_id · cost</span> - and that is the whole of it.</p>
-    </div>
-    <div class="marquee-mask mt-12 overflow-hidden reveal">
-      <div class="marquee">
-        <span class="chip !bg-white !border-ink-200 !text-ink-700">Next.js</span><span class="chip !bg-white !border-ink-200 !text-ink-700">Python</span><span class="chip !bg-white !border-ink-200 !text-ink-700">FastAPI</span><span class="chip !bg-white !border-ink-200 !text-ink-700">Go</span><span class="chip !bg-white !border-ink-200 !text-ink-700">Rust</span><span class="chip !bg-white !border-ink-200 !text-ink-700">n8n</span><span class="chip !bg-white !border-ink-200 !text-ink-700">Cloudflare Workers</span><span class="chip !bg-white !border-ink-200 !text-ink-700">Express</span><span class="chip !bg-white !border-ink-200 !text-ink-700">LangChain</span><span class="chip !bg-white !border-ink-200 !text-ink-700">Supabase</span><span class="chip !bg-white !border-ink-200 !text-ink-700">Vercel</span><span class="chip !bg-white !border-ink-200 !text-ink-700">Deno</span>
-        <span class="chip !bg-white !border-ink-200 !text-ink-700">Next.js</span><span class="chip !bg-white !border-ink-200 !text-ink-700">Python</span><span class="chip !bg-white !border-ink-200 !text-ink-700">FastAPI</span><span class="chip !bg-white !border-ink-200 !text-ink-700">Go</span><span class="chip !bg-white !border-ink-200 !text-ink-700">Rust</span><span class="chip !bg-white !border-ink-200 !text-ink-700">n8n</span><span class="chip !bg-white !border-ink-200 !text-ink-700">Cloudflare Workers</span><span class="chip !bg-white !border-ink-200 !text-ink-700">Express</span><span class="chip !bg-white !border-ink-200 !text-ink-700">LangChain</span><span class="chip !bg-white !border-ink-200 !text-ink-700">Supabase</span><span class="chip !bg-white !border-ink-200 !text-ink-700">Vercel</span><span class="chip !bg-white !border-ink-200 !text-ink-700">Deno</span>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- HOW IT WORKS -->
-<section id="how" class="bg-white">
-  <div class="wrap py-20 md:py-24">
-    <div class="max-w-2xl reveal">
-      <div class="eyebrow">How it works</div>
-      <h2 class="h2 balance mt-4">Two SDK calls wrap every agent.</h2>
-      <p class="lead mt-4">authorize() before the work, debit() after success. The pattern never changes - copy it once, reuse it across your whole suite.</p>
-    </div>
-
-    <div class="mt-12 grid lg:grid-cols-2 gap-6 items-stretch">
-      <!-- steps -->
-      <div class="grid sm:grid-cols-1 gap-4">
-        <div class="reveal card p-6 flex gap-4 items-start">
-          <span class="shrink-0 w-11 h-11 rounded-xl bg-brand-50 text-brand-600 flex items-center justify-center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></span>
-          <div><div class="font-bold text-[1.05rem]">1 · authorize()</div><p class="mt-1 text-[.92rem] text-ink-600 leading-relaxed">Plan gate and balance check return under 50ms with a full decision package - never a blind 402 wall.</p></div>
-        </div>
-        <div class="reveal card p-6 flex gap-4 items-start">
-          <span class="shrink-0 w-11 h-11 rounded-xl bg-brand-50 text-brand-600 flex items-center justify-center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.9 5.8L20 9l-4.5 3.3L17 18l-5-3.3L7 18l1.5-5.7L4 9l6.1-.2z"/></svg></span>
-          <div><div class="font-bold text-[1.05rem]">2 · Run your agent</div><p class="mt-1 text-[.92rem] text-ink-600 leading-relaxed">Any HTTP-speaking workload. AgentMint is agnostic to whatever runs in the middle.</p></div>
-        </div>
-        <div class="reveal card p-6 flex gap-4 items-start">
-          <span class="shrink-0 w-11 h-11 rounded-xl bg-brand-50 text-brand-600 flex items-center justify-center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span>
-          <div><div class="font-bold text-[1.05rem]">3 · debit()</div><p class="mt-1 text-[.92rem] text-ink-600 leading-relaxed">Atomic Postgres transaction with advisory lock. Idempotent by resource_id. Balance never goes negative.</p></div>
-        </div>
-      </div>
-
-      <!-- code -->
-      <div class="reveal rounded-2xl overflow-hidden border border-ink-800 self-stretch" style="background:#06221a;">
-        <div class="flex items-center justify-between px-5 py-3 border-b border-ink-800 text-ink-300 text-[.78rem] mono">
-          <span class="flex items-center gap-2"><span class="flex gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-brand-500"></span><span class="w-2.5 h-2.5 rounded-full bg-ink-700"></span><span class="w-2.5 h-2.5 rounded-full bg-ink-700"></span></span><span class="ml-2">route.ts</span></span>
-          <button id="copyBtn" class="hover:text-white transition-colors flex items-center gap-1.5"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span id="copyLabel">Copy</span></button>
-        </div>
-<pre id="code" class="px-5 py-5 text-[12.5px] md:text-[13px] leading-[1.8] overflow-x-auto" style="color:#c2d2cb;"><span style="color:#5cd49d">const</span> auth = <span style="color:#5cd49d">await</span> agentmint.authorize({
-  workspaceId, product: <span style="color:#ffce9e">'your_agent'</span>, action: <span style="color:#ffce9e">'do_thing'</span>, cost: <span style="color:#ff8a5c">25</span>,
-});
-<span style="color:#5cd49d">if</span> (!auth.allowed) <span style="color:#5cd49d">return</span> Response.json(auth, { status: <span style="color:#ff8a5c">402</span> });
-
-<span style="color:#618376">// whatever your agent actually does</span>
-<span style="color:#5cd49d">const</span> result = <span style="color:#5cd49d">await</span> runYourAgent(req.body);
-
-<span style="color:#5cd49d">await</span> agentmint.debit({
-  workspaceId, product: <span style="color:#ffce9e">'your_agent'</span>, action: <span style="color:#ffce9e">'do_thing'</span>, cost: <span style="color:#ff8a5c">25</span>,
-  resourceId: result.id,
-  idempotencyKey: <span style="color:#ffce9e">`${'$'}{workspaceId}-${'$'}{result.id}`</span>,
-});</pre>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- FEATURES (alternating) -->
-<section id="features" class="bg-ink-50 border-y border-ink-100">
-  <div class="wrap py-20 md:py-24 space-y-20 md:space-y-28">
-
-    <!-- Feature 1: shared wallet -->
-    <div class="grid md:grid-cols-2 gap-x-14 gap-y-10 items-center">
-      <div class="reveal">
-        <div class="eyebrow">One wallet</div>
-        <h2 class="h2 balance mt-4">One balance across your entire suite.</h2>
-        <p class="lead mt-4">The differentiated primitive. Your customer buys credits once and spends them across every agent in your suite - writer, analyzer, scheduler, whatever you ship next. You see burn rate, top agents and runway in real time, with per-agent revenue attribution under the hood.</p>
-        <ul class="mt-6 space-y-3 text-[.95rem] font-medium text-ink-700">
-          <li class="flex gap-2.5"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#10a868" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" class="mt-0.5 shrink-0"><polyline points="20 6 9 17 4 12"/></svg> Shared credit wallet, per workspace</li>
-          <li class="flex gap-2.5"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#10a868" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" class="mt-0.5 shrink-0"><polyline points="20 6 9 17 4 12"/></svg> Per-agent revenue attribution</li>
-          <li class="flex gap-2.5"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#10a868" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" class="mt-0.5 shrink-0"><polyline points="20 6 9 17 4 12"/></svg> Real-time burn rate &amp; runway</li>
-        </ul>
-      </div>
-      <div class="reveal card p-6">
-        <div class="flex items-center justify-between text-[.78rem] font-semibold text-ink-500 uppercase tracking-wider"><span>Wallet activity</span><span class="chip !py-0.5 !px-2 !text-[.72rem]"><span class="dot bg-brand-500"></span>this week</span></div>
-        <div class="mt-4 grid grid-cols-3 gap-2 text-center">
-          <div class="rounded-xl bg-ink-50 border border-ink-100 p-3"><div class="text-[.72rem] text-ink-500">Top agent</div><div class="font-bold mt-1 text-[.9rem]">Writer</div></div>
-          <div class="rounded-xl bg-ink-50 border border-ink-100 p-3"><div class="text-[.72rem] text-ink-500">Burn / day</div><div class="font-bold mt-1 text-[.9rem] tnum">82 cr</div></div>
-          <div class="rounded-xl bg-ink-50 border border-ink-100 p-3"><div class="text-[.72rem] text-ink-500">Next invoice</div><div class="font-bold mt-1 text-[.9rem] tnum">Jun 27</div></div>
-        </div>
-        <div class="mt-5 flex items-end gap-2 h-28">
-          <div class="flex-1 rounded-t-md bg-brand-200" style="height:42%"></div>
-          <div class="flex-1 rounded-t-md bg-brand-300" style="height:64%"></div>
-          <div class="flex-1 rounded-t-md bg-brand-300" style="height:55%"></div>
-          <div class="flex-1 rounded-t-md bg-brand-400" style="height:80%"></div>
-          <div class="flex-1 rounded-t-md bg-brand-500" style="height:73%"></div>
-          <div class="flex-1 rounded-t-md bg-brand-500" style="height:92%"></div>
-          <div class="flex-1 rounded-t-md bg-brand-600" style="height:68%"></div>
-        </div>
-        <div class="mt-2 flex justify-between text-[.7rem] text-ink-400 mono"><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span></div>
-      </div>
-    </div>
-
-    <!-- Feature 2: enriched 402 / plan gating -->
-    <div class="grid md:grid-cols-2 gap-x-14 gap-y-10 items-center">
-      <div class="reveal md:order-2">
-        <div class="eyebrow">Plan gating</div>
-        <h2 class="h2 balance mt-4">Every 402 is an upgrade event.</h2>
-        <p class="lead mt-4">authorize() never returns a blind wall. Each rejection carries the current plan, required plan, shortfall and a ready-made top-up URL - so your funnel converts itself.</p>
-        <ul class="mt-6 space-y-3 text-[.95rem] font-medium text-ink-700">
-          <li class="flex gap-2.5"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#10a868" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" class="mt-0.5 shrink-0"><polyline points="20 6 9 17 4 12"/></svg> Enriched, structured 402 responses</li>
-          <li class="flex gap-2.5"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#10a868" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" class="mt-0.5 shrink-0"><polyline points="20 6 9 17 4 12"/></svg> Low-credit nudge email at &lt; 100</li>
-          <li class="flex gap-2.5"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#10a868" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" class="mt-0.5 shrink-0"><polyline points="20 6 9 17 4 12"/></svg> Server-side funnel events</li>
-        </ul>
-      </div>
-      <div class="reveal md:order-1 rounded-2xl overflow-hidden border border-ink-800" style="background:#06221a;">
-        <div class="flex items-center justify-between px-5 py-3 border-b border-ink-800 text-ink-300 text-[.78rem] mono"><span>402 · response</span><span class="text-coral-400">payment_required</span></div>
-<pre class="px-5 py-5 text-[12.5px] leading-[1.85] overflow-x-auto" style="color:#c2d2cb;">{
-  <span style="color:#ffce9e">"allowed"</span>: <span style="color:#ff8a5c">false</span>,
-  <span style="color:#ffce9e">"reason"</span>: <span style="color:#ffce9e">"insufficient_credits"</span>,
-  <span style="color:#ffce9e">"currentPlan"</span>: <span style="color:#ffce9e">"starter"</span>,
-  <span style="color:#ffce9e">"requiredPlan"</span>: <span style="color:#ffce9e">"growth"</span>,
-  <span style="color:#ffce9e">"shortfall"</span>: <span style="color:#ff8a5c">15</span>,
-  <span style="color:#ffce9e">"topUpUrl"</span>: <span style="color:#5cd49d">"https://pay.agentmint.com/t/…"</span>
-}</pre>
-      </div>
-    </div>
-
-    <!-- Feature 3: revenue intelligence -->
-    <div class="grid md:grid-cols-2 gap-x-14 gap-y-10 items-center">
-      <div class="reveal">
-        <div class="eyebrow">Monetisation that also converts</div>
-        <h2 class="h2 balance mt-4">Every rejection is an upgrade event.</h2>
-        <p class="lead mt-4">An enriched 402 contract plus an append-only <span class="mono text-ink-800 text-[.95em]">funnel_events</span> stream (trial_started, first_agent_used, checkout_started, payment_completed) - so your billing layer also runs upgrade-flow CRO. The thing the OSS billing stacks don&rsquo;t ship and the enterprise stacks don&rsquo;t tune for agents.</p>
-        <ul class="mt-6 space-y-3 text-[.95rem] font-medium text-ink-700">
-          <li class="flex gap-2.5"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#10a868" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" class="mt-0.5 shrink-0"><polyline points="20 6 9 17 4 12"/></svg> Lifecycle events out of the box</li>
-          <li class="flex gap-2.5"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#10a868" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" class="mt-0.5 shrink-0"><polyline points="20 6 9 17 4 12"/></svg> Real-time MRR &amp; NRR</li>
-          <li class="flex gap-2.5"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#10a868" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" class="mt-0.5 shrink-0"><polyline points="20 6 9 17 4 12"/></svg> Credit-cost A/B testing</li>
-        </ul>
-      </div>
-      <div class="reveal card p-6">
-        <div class="text-[.78rem] font-semibold text-ink-500 uppercase tracking-wider mb-4">Conversion funnel · 30 days</div>
-        <div class="space-y-3">
-          <div class="flex items-center gap-3"><span class="mono text-[.78rem] w-32 shrink-0 text-ink-600">trial_started</span><div class="flex-1 h-7 rounded-lg bg-ink-100 overflow-hidden"><div class="h-full rounded-lg bg-brand-500 flex items-center justify-end pr-2 text-white text-[.72rem] font-bold" style="width:100%">1,000</div></div></div>
-          <div class="flex items-center gap-3"><span class="mono text-[.78rem] w-32 shrink-0 text-ink-600">first_agent_used</span><div class="flex-1 h-7 rounded-lg bg-ink-100 overflow-hidden"><div class="h-full rounded-lg bg-brand-500 flex items-center justify-end pr-2 text-white text-[.72rem] font-bold" style="width:74%">740</div></div></div>
-          <div class="flex items-center gap-3"><span class="mono text-[.78rem] w-32 shrink-0 text-ink-600">checkout_started</span><div class="flex-1 h-7 rounded-lg bg-ink-100 overflow-hidden"><div class="h-full rounded-lg bg-brand-500 flex items-center justify-end pr-2 text-white text-[.72rem] font-bold" style="width:46%">460</div></div></div>
-          <div class="flex items-center gap-3"><span class="mono text-[.78rem] w-32 shrink-0 text-ink-600">payment_completed</span><div class="flex-1 h-7 rounded-lg bg-ink-100 overflow-hidden"><div class="h-full rounded-lg bg-coral-500 flex items-center justify-end pr-2 text-white text-[.72rem] font-bold" style="width:31%">310</div></div></div>
-        </div>
-        <div class="mt-5 pt-4 border-t border-ink-100 flex items-center justify-between text-[.82rem]"><span class="text-ink-500 font-medium">Trial → paid</span><span class="font-extrabold text-brand-600 text-[1.1rem] tnum">31%</span></div>
-      </div>
-    </div>
-
-  </div>
-</section>
-
-<!-- BUILDER PRICING (what AgentMint charges YOU) -->
-<section id="pricing" class="bg-white">
-  <div class="wrap pt-20 md:pt-24 pb-10 md:pb-12">
-    <div class="text-center max-w-2xl mx-auto reveal">
-      <div class="eyebrow justify-center">Pricing - what AgentMint charges you</div>
-      <h2 class="h2 balance mt-4">First cohort is on the house.</h2>
-      <p class="lead mt-4">
-        We&rsquo;re pre-pilot. Builders in the first cohort pay <strong class="text-ink-950">$0</strong> while we validate the contract together.
-        Post-pilot: a flat platform fee plus a capped percentage of payment volume processed - you keep the rest.
-        AgentMint never holds your money; payouts run through your own Stripe (USD) or Razorpay/Cashfree (INR) once those rails ship.
-      </p>
-    </div>
-
-    <div class="reveal mt-10 grid md:grid-cols-3 gap-4 max-w-5xl mx-auto">
-      <div class="card p-6">
-        <div class="text-[.78rem] font-semibold text-ink-500 uppercase tracking-wider">Now</div>
-        <div class="mt-2 font-extrabold text-[1.5rem]">First cohort: $0</div>
-        <p class="mt-2 text-[.92rem] text-ink-600 leading-relaxed">Pilot builders get the platform free while we harden the contract. Settlement is offline until Connect ships.</p>
-      </div>
-      <div class="card p-6" style="border-color:#10a868;">
-        <div class="text-[.78rem] font-semibold uppercase tracking-wider" style="color:#0a6e45;">Post-pilot · platform fee</div>
-        <div class="mt-2 font-extrabold text-[1.5rem]">Flat monthly</div>
-        <p class="mt-2 text-[.92rem] text-ink-600 leading-relaxed">A flat fee per active workspace tier. Number lands once we have enough usage data to set it fairly.</p>
-      </div>
-      <div class="card p-6">
-        <div class="text-[.78rem] font-semibold text-ink-500 uppercase tracking-wider">Post-pilot · volume</div>
-        <div class="mt-2 font-extrabold text-[1.5rem]">% of payments <span class="text-ink-400 font-medium text-[.8rem]">(capped)</span></div>
-        <p class="mt-2 text-[.92rem] text-ink-600 leading-relaxed">A small percentage of payment volume processed through your customers&rsquo; subscriptions and top-ups, hard-capped per workspace per month.</p>
-      </div>
-    </div>
-
-    <p class="text-center text-[.84rem] text-ink-500 mt-6 reveal">Want in to the first cohort? <a href="mailto:hello@agentmint.com" class="text-brand-600 font-semibold underline underline-offset-4">Email us</a>.</p>
-  </div>
-</section>
-
-<!-- CUSTOMER PLAN TEMPLATES (what YOUR customers see) -->
-<section class="bg-white">
-  <div class="wrap pt-10 md:pt-12 pb-20 md:pb-24">
-    <div class="text-center max-w-2xl mx-auto reveal">
-      <div class="eyebrow justify-center">Template plans for your customers</div>
-      <h2 class="h2 balance mt-4">The plans your customers see.</h2>
-      <p class="lead mt-4">These tiers are templates your end customers subscribe to. Tiers, grants, top-up packs and rollover rules are all database-driven - bring your own.</p>
-    </div>
-    <div class="mt-12 grid md:grid-cols-3 gap-5 items-stretch">
-      <!-- Trial -->
-      <div class="reveal card p-7 flex flex-col">
-        <div class="font-bold text-ink-600">Trial</div>
-        <div class="mt-3 flex items-baseline gap-1.5"><span class="text-[2.6rem] leading-none font-extrabold tnum">Free</span></div>
-        <div class="mt-2 text-[.88rem] text-ink-500 font-medium">100 credits · one-time</div>
-        <ul class="mt-6 space-y-2.5 text-[.92rem] text-ink-700 flex-1 font-medium">
-          <li class="flex gap-2.5"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#10a868" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" class="mt-0.5 shrink-0"><polyline points="20 6 9 17 4 12"/></svg> Try any 3 integrated agents</li>
-          <li class="flex gap-2.5"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#10a868" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" class="mt-0.5 shrink-0"><polyline points="20 6 9 17 4 12"/></svg> No card required</li>
-        </ul>
-        <a href="#" class="btn btn-line mt-7 w-full justify-center">Try this workspace</a>
-      </div>
-      <!-- Starter featured -->
-      <div class="reveal card p-7 flex flex-col relative md:-mt-4 md:mb-[-1rem]" style="border:2px solid #10a868; box-shadow:0 30px 60px -28px rgba(16,168,104,.45);">
-        <div class="absolute -top-3.5 left-1/2 -translate-x-1/2 chip !bg-brand-500 !text-white !border-brand-500 !text-[.72rem] font-bold tracking-wide">MOST POPULAR</div>
-        <div class="font-bold text-ink-600 mt-1">Starter</div>
-        <div class="mt-3 flex items-baseline gap-1.5"><span class="text-[2.6rem] leading-none font-extrabold tnum">$49</span><span class="text-ink-400 font-medium">/ mo</span></div>
-        <div class="mt-2 text-[.88rem] text-ink-500 font-medium">500 credits / month</div>
-        <ul class="mt-6 space-y-2.5 text-[.92rem] text-ink-700 flex-1 font-medium">
-          <li class="flex gap-2.5"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#10a868" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" class="mt-0.5 shrink-0"><polyline points="20 6 9 17 4 12"/></svg> All Starter-tier agents</li>
-          <li class="flex gap-2.5"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#10a868" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" class="mt-0.5 shrink-0"><polyline points="20 6 9 17 4 12"/></svg> +500 credit top-ups ($9 each)</li>
-          <li class="flex gap-2.5"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#10a868" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" class="mt-0.5 shrink-0"><polyline points="20 6 9 17 4 12"/></svg> Stripe-native invoices</li>
-        </ul>
-        <a href="#" class="btn btn-green mt-7 w-full justify-center">Preview Starter</a>
-      </div>
-      <!-- Growth -->
-      <div class="reveal card p-7 flex flex-col">
-        <div class="font-bold text-ink-600">Growth</div>
-        <div class="mt-3 flex items-baseline gap-1.5"><span class="text-[2.6rem] leading-none font-extrabold tnum">$199</span><span class="text-ink-400 font-medium">/ mo</span></div>
-        <div class="mt-2 text-[.88rem] text-ink-500 font-medium">2,500 credits / month</div>
-        <ul class="mt-6 space-y-2.5 text-[.92rem] text-ink-700 flex-1 font-medium">
-          <li class="flex gap-2.5"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#10a868" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" class="mt-0.5 shrink-0"><polyline points="20 6 9 17 4 12"/></svg> Every agent in the suite</li>
-          <li class="flex gap-2.5"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#10a868" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" class="mt-0.5 shrink-0"><polyline points="20 6 9 17 4 12"/></svg> Credit rollover (500 / mo)</li>
-          <li class="flex gap-2.5"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#10a868" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" class="mt-0.5 shrink-0"><polyline points="20 6 9 17 4 12"/></svg> Team seats (Phase 2)</li>
-        </ul>
-        <a href="#" class="btn btn-line mt-7 w-full justify-center">Preview Growth</a>
-      </div>
-    </div>
-    <p class="text-center text-[.84rem] text-ink-400 mt-6 reveal">Standard top-up pack: +500 credits for $9. AgentMint's platform pricing for you (the agent company) is separate - see FAQ.</p>
-  </div>
-</section>
-
-<!-- CTA BAND -->
-<section class="bg-white pb-20 md:pb-24">
-  <div class="wrap">
-    <div class="reveal relative overflow-hidden rounded-3xl bg-ink-950 text-white text-center px-6 py-16 md:py-20">
-      <div class="blob" style="width:24rem;height:24rem;background:#10a868;top:-10rem;left:50%;margin-left:-12rem;opacity:.4;"></div>
-      <div class="relative">
-        <h2 class="h2 balance max-w-2xl mx-auto">You build the agent. We handle the rest.</h2>
-        <p class="lead mt-4 max-w-xl mx-auto" style="color:#c2d2cb;">Two SDK calls, three configuration steps, and your agent inherits a complete payment lifecycle - with money landing in your bank.</p>
-        <div class="mt-8 flex flex-wrap justify-center gap-3">
-          <a href="/build/signup" class="btn btn-green">Start building - it's free</a>
-          <a href="#how" class="btn btn-white">See how it works</a>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- FAQ -->
-<section id="faq" class="bg-ink-50 border-t border-ink-100">
-  <div class="wrap py-20 md:py-24">
-    <div class="grid md:grid-cols-12 gap-x-12 gap-y-8 items-start">
-      <div class="md:col-span-4 reveal md:sticky md:top-24">
-        <div class="eyebrow">FAQ</div>
-        <h2 class="h2 balance mt-4">Answers before you ask.</h2>
-        <p class="lead mt-4">Still unsure? <a href="mailto:hello@agentmint.com" class="text-brand-600 font-semibold underline underline-offset-4">Email the team.</a></p>
-      </div>
-      <div class="md:col-span-8 reveal space-y-3">
-        <details class="card p-5 group"><summary class="flex items-center justify-between gap-6 cursor-pointer list-none"><span class="font-bold">I am a solo dev. Is this overkill for me?</span><span class="chev text-ink-400 text-2xl leading-none shrink-0 transition-transform group-open:rotate-45">+</span></summary><p class="mt-3 text-[.92rem] text-ink-600 leading-relaxed">No. Signup is 30 seconds, you get the same SDK, the same dashboard, the same Stripe Connect path. There is no minimum scale. Trial credits are free.</p></details>
-        <details class="card p-5 group"><summary class="flex items-center justify-between gap-6 cursor-pointer list-none"><span class="font-bold">Do my agents need a specific stack?</span><span class="chev text-ink-400 text-2xl leading-none shrink-0 transition-transform group-open:rotate-45">+</span></summary><p class="mt-3 text-[.92rem] text-ink-600 leading-relaxed">No. There is no SDK package yet - integration is two plain HTTP POST calls (authorize + debit). Anything that speaks HTTPS - Python, Go, Rust, edge functions, n8n - can bill through AgentMint. A thin typed SDK wrapper is on the roadmap once the wire format is locked.</p></details>
-        <details class="card p-5 group"><summary class="flex items-center justify-between gap-6 cursor-pointer list-none"><span class="font-bold">How does the money actually get to my bank?</span><span class="chev text-ink-400 text-2xl leading-none shrink-0 transition-transform group-open:rotate-45">+</span></summary><p class="mt-3 text-[.92rem] text-ink-600 leading-relaxed">Stripe Connect: your customers pay through your own Stripe account, AgentMint deducts a small platform fee, and Stripe payouts run straight to your bank on your schedule. AgentMint never holds the money.</p></details>
-        <details class="card p-5 group"><summary class="flex items-center justify-between gap-6 cursor-pointer list-none"><span class="font-bold">How do you price AgentMint?</span><span class="chev text-ink-400 text-2xl leading-none shrink-0 transition-transform group-open:rotate-45">+</span></summary><p class="mt-3 text-[.92rem] text-ink-600 leading-relaxed">See the <a href="#pricing" class="text-brand-600 font-semibold underline underline-offset-4">pricing section</a> above for the full picture. Summary: first cohort = $0, post-pilot = flat platform fee + capped percentage of payment volume processed.</p></details>
-        <details class="card p-5 group"><summary class="flex items-center justify-between gap-6 cursor-pointer list-none"><span class="font-bold">Can credit costs change without a deploy?</span><span class="chev text-ink-400 text-2xl leading-none shrink-0 transition-transform group-open:rotate-45">+</span></summary><p class="mt-3 text-[.92rem] text-ink-600 leading-relaxed">Yes. Costs live in the registry table. Move an action from 50 to 40 credits and it ships on the next request.</p></details>
-        <details class="card p-5 group"><summary class="flex items-center justify-between gap-6 cursor-pointer list-none"><span class="font-bold">What about India, INR and GST?</span><span class="chev text-ink-400 text-2xl leading-none shrink-0 transition-transform group-open:rotate-45">+</span></summary><p class="mt-3 text-[.92rem] text-ink-600 leading-relaxed">INR settlement via Razorpay/Cashfree route accounts, UPI autopay for top-ups and GST-compliant invoicing are top-three priorities - actively in build. The schema already supports per-currency plans. USD via Stripe Connect ships first; INR lands close behind.</p></details>
-        <details class="card p-5 group"><summary class="flex items-center justify-between gap-6 cursor-pointer list-none"><span class="font-bold">Why a shared wallet across the whole suite?</span><span class="chev text-ink-400 text-2xl leading-none shrink-0 transition-transform group-open:rotate-45">+</span></summary><p class="mt-3 text-[.92rem] text-ink-600 leading-relaxed">Because most agent businesses ship more than one agent. A customer of a writer + scheduler + analyzer suite should buy credits once and spend them anywhere. Per-agent attribution still lights up your revenue split internally. This is the part the metering incumbents (organized around single-product billing) do not emphasize.</p></details>
-        <details class="card p-5 group"><summary class="flex items-center justify-between gap-6 cursor-pointer list-none"><span class="font-bold">Is AgentMint the same as x402 / agent-initiated payments?</span><span class="chev text-ink-400 text-2xl leading-none shrink-0 transition-transform group-open:rotate-45">+</span></summary><p class="mt-3 text-[.92rem] text-ink-600 leading-relaxed">No, different problem. x402 / Stripe MPP / Skyfire let <em>agents</em> pay autonomously. AgentMint lets <em>humans</em> pay <em>for</em> the agents you ship. The &ldquo;402&rdquo; in our examples is the HTTP status code we use as the structured upgrade signal, not the x402 protocol.</p></details>
-      </div>
-    </div>
-  </div>
-</section>
-
-</main>
-
-<!-- FOOTER -->
-<footer class="bg-ink-950 text-ink-300">
-  <div class="wrap py-14 grid md:grid-cols-4 gap-10 text-[.9rem]">
-    <div class="md:col-span-2">
-      <a href="#top" class="flex items-center gap-2.5 font-extrabold text-white text-[1.05rem]">
-        <svg width="26" height="26" viewBox="0 0 28 28" fill="none"><rect x="2" y="2" width="24" height="24" rx="7" fill="#10a868"/><circle cx="14" cy="14" r="6" stroke="#fff" stroke-width="1.9" fill="none"/><path d="M14 10.2v7.6M11.6 12.6h4.8M11.6 15.4h4.8" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/></svg>
-        Agent<span class="text-brand-400">Mint</span>
+  <!-- ─────────── HEADER + MEGA-MENU ─────────── -->
+  <header id="hdr" class="sticky top-0 z-30 bg-white/95 backdrop-blur border-b border-ink-100">
+    <div class="wrap h-[64px] flex items-center justify-between gap-6">
+      <a href="#" class="flex items-center gap-2.5 font-extrabold text-ink-950">
+        <svg width="26" height="26" viewBox="0 0 28 28" fill="none" aria-hidden>
+          <rect x="2" y="2" width="24" height="24" rx="7" fill="#10a868"/>
+          <circle cx="14" cy="14" r="6" stroke="#fff" stroke-width="1.9" fill="none"/>
+          <path d="M14 10.2v7.6M11.6 12.6h4.8M11.6 15.4h4.8" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/>
+        </svg>
+        <span class="text-[1.05rem]">Agent<span class="text-brand-500">Mint</span></span>
       </a>
-      <p class="mt-4 max-w-sm leading-relaxed text-ink-400">The payments, credits and subscriptions stack for AI agents. Monetize all your agents from one place.</p>
-      <p class="mt-4 text-ink-500 text-[.8rem]">© 2026 AgentMint. All rights reserved.</p>
+
+      <nav class="hidden md:flex items-center gap-7">
+        <button class="nav-trigger flex items-center gap-1 px-1 py-2 text-[.93rem] font-medium text-ink-700 hover:text-ink-950 transition" data-menu="platform" aria-expanded="false">
+          Platform
+          <svg class="chev" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <button class="nav-trigger flex items-center gap-1 px-1 py-2 text-[.93rem] font-medium text-ink-700 hover:text-ink-950 transition" data-menu="solutions" aria-expanded="false">
+          Solutions
+          <svg class="chev" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <button class="nav-trigger flex items-center gap-1 px-1 py-2 text-[.93rem] font-medium text-ink-700 hover:text-ink-950 transition" data-menu="resources" aria-expanded="false">
+          Resources
+          <svg class="chev" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <a href="#pricing" class="px-1 py-2 text-[.93rem] font-medium text-ink-700 hover:text-ink-950 transition">Pricing</a>
+        <a href="#faq" class="px-1 py-2 text-[.93rem] font-medium text-ink-700 hover:text-ink-950 transition">FAQ</a>
+      </nav>
+
+      <div class="flex items-center gap-3">
+        <a href="#" class="hidden sm:inline text-[.92rem] font-medium text-ink-700 hover:text-ink-950">Login</a>
+        <a href="#" class="inline-flex items-center gap-1.5 text-[.9rem] font-semibold text-white bg-ink-950 hover:bg-ink-800 rounded-lg px-4 py-2.5 transition">
+          Start building
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </a>
+      </div>
     </div>
-    <div>
-      <div class="text-[.72rem] uppercase tracking-[.14em] text-ink-500 font-semibold">Product</div>
-      <ul class="mt-4 space-y-2.5">
-        <li><a href="#stack" class="hover:text-white">Any stack</a></li>
-        <li><a href="#how" class="hover:text-white">How it works</a></li>
-        <li><a href="#features" class="hover:text-white">Features</a></li>
-        <li><a href="#pricing" class="hover:text-white">Pricing</a></li>
-        <li><a href="#faq" class="hover:text-white">FAQ</a></li>
-      </ul>
+
+    <!-- mega-panels -->
+    <div id="mega" class="absolute top-full left-0 right-0 bg-white border-b border-ink-100 shadow-[0_24px_48px_-24px_rgba(6,34,26,0.18)]" style="display:none">
+
+      <div class="megapanel wrap py-9" data-panel="platform">
+        <div class="grid md:grid-cols-[1fr_1fr_320px] gap-x-10 gap-y-8">
+          <div>
+            <div class="text-[11px] uppercase tracking-[.14em] text-ink-400 font-bold mb-4">Core</div>
+            <div class="space-y-4">
+              <a href="#features" class="flex gap-3 group">
+                <span class="w-9 h-9 rounded-lg bg-ink-50 text-ink-700 flex items-center justify-center group-hover:bg-brand-500/10 group-hover:text-brand-600 transition flex-shrink-0">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 7H5a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/><path d="M16 14h.01"/><path d="M3 9V7a2 2 0 0 1 2-2h12"/></svg>
+                </span>
+                <div><div class="font-bold text-ink-950 text-[.92rem]">Credit wallet</div><div class="text-[.8rem] text-ink-500 mt-0.5">One balance across every agent in the suite</div></div>
+              </a>
+              <a href="#features" class="flex gap-3 group">
+                <span class="w-9 h-9 rounded-lg bg-ink-50 text-ink-700 flex items-center justify-center group-hover:bg-brand-500/10 group-hover:text-brand-600 transition flex-shrink-0">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                </span>
+                <div><div class="font-bold text-ink-950 text-[.92rem]">Plan gating</div><div class="text-[.8rem] text-ink-500 mt-0.5">Authorize with structured 402 decisions</div></div>
+              </a>
+              <a href="#features" class="flex gap-3 group">
+                <span class="w-9 h-9 rounded-lg bg-ink-50 text-ink-700 flex items-center justify-center group-hover:bg-brand-500/10 group-hover:text-brand-600 transition flex-shrink-0">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                </span>
+                <div><div class="font-bold text-ink-950 text-[.92rem]">Atomic debit</div><div class="text-[.8rem] text-ink-500 mt-0.5">Idempotent by resource_id, never goes negative</div></div>
+              </a>
+            </div>
+          </div>
+          <div>
+            <div class="text-[11px] uppercase tracking-[.14em] text-ink-400 font-bold mb-4">Money rail</div>
+            <div class="space-y-4">
+              <a href="#features" class="flex gap-3 group">
+                <span class="w-9 h-9 rounded-lg bg-ink-50 text-ink-700 flex items-center justify-center group-hover:bg-brand-500/10 group-hover:text-brand-600 transition flex-shrink-0">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 14l4-4 4 4 4-6"/></svg>
+                </span>
+                <div><div class="font-bold text-ink-950 text-[.92rem]">Per-agent revenue</div><div class="text-[.8rem] text-ink-500 mt-0.5">Attribution + burn rate, broken out per agent</div></div>
+              </a>
+              <a href="#features" class="flex gap-3 group">
+                <span class="w-9 h-9 rounded-lg bg-ink-50 text-ink-700 flex items-center justify-center group-hover:bg-brand-500/10 group-hover:text-brand-600 transition flex-shrink-0">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+                </span>
+                <div><div class="font-bold text-ink-950 text-[.92rem]">Stripe Connect</div><div class="text-[.8rem] text-ink-500 mt-0.5">USD payouts straight to your bank</div></div>
+              </a>
+              <a href="#features" class="flex gap-3 group">
+                <span class="w-9 h-9 rounded-lg bg-ink-50 text-ink-700 flex items-center justify-center group-hover:bg-brand-500/10 group-hover:text-brand-600 transition flex-shrink-0">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10A15.3 15.3 0 0 1 8 12 15.3 15.3 0 0 1 12 2z"/></svg>
+                </span>
+                <div><div class="font-bold text-ink-950 text-[.92rem]">India settlement</div><div class="text-[.8rem] text-ink-500 mt-0.5">INR via Razorpay/Cashfree · UPI · GST (in build)</div></div>
+              </a>
+            </div>
+          </div>
+          <div class="rounded-xl p-5 bg-gradient-to-br from-brand-50 to-ink-50 border border-brand-100">
+            <div class="text-[11px] uppercase tracking-[.14em] text-brand-700 font-bold">Inside the dashboard</div>
+            <div class="mt-3 rounded-lg bg-white border border-ink-100 p-3">
+              <div class="flex items-center justify-between text-[.7rem] text-ink-500"><span>Wallet</span><span class="mono text-[.65rem]">2,184 cr</span></div>
+              <div class="mt-2 h-1.5 rounded-full bg-ink-100 overflow-hidden"><div class="h-full bg-brand-500" style="width:73%"></div></div>
+              <div class="mt-3 space-y-1.5">
+                <div class="flex justify-between text-[.7rem]"><span class="mono text-ink-700">writer</span><span class="text-coral-500 mono">−25</span></div>
+                <div class="flex justify-between text-[.7rem]"><span class="mono text-ink-700">analyzer</span><span class="text-coral-500 mono">−30</span></div>
+              </div>
+            </div>
+            <a href="#" class="mt-4 inline-flex items-center gap-1 text-[.78rem] font-bold text-ink-950 hover:text-brand-600 transition">
+              See it live
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <div class="megapanel wrap py-9" data-panel="solutions">
+        <div class="grid md:grid-cols-3 gap-x-10 gap-y-8">
+          <div>
+            <div class="text-[11px] uppercase tracking-[.14em] text-ink-400 font-bold mb-4">Who it's for</div>
+            <div class="space-y-4">
+              <a href="#features" class="block group"><div class="font-bold text-ink-950 text-[.92rem] group-hover:text-brand-600 transition">Indie developers</div><div class="text-[.8rem] text-ink-500 mt-0.5">Ship + bill in an afternoon</div></a>
+              <a href="#features" class="block group"><div class="font-bold text-ink-950 text-[.92rem] group-hover:text-brand-600 transition">AI startups</div><div class="text-[.8rem] text-ink-500 mt-0.5">Suite-wide credits with per-agent attribution</div></a>
+              <a href="#features" class="block group"><div class="font-bold text-ink-950 text-[.92rem] group-hover:text-brand-600 transition">Small studios</div><div class="text-[.8rem] text-ink-500 mt-0.5">Bill across multiple client deployments</div></a>
+            </div>
+          </div>
+          <div>
+            <div class="text-[11px] uppercase tracking-[.14em] text-ink-400 font-bold mb-4">By stage</div>
+            <div class="space-y-4">
+              <a href="#features" class="block group"><div class="font-bold text-ink-950 text-[.92rem] group-hover:text-brand-600 transition">Pre-revenue MVP</div><div class="text-[.8rem] text-ink-500 mt-0.5">Trial credits + 402 paywall in one move</div></a>
+              <a href="#features" class="block group"><div class="font-bold text-ink-950 text-[.92rem] group-hover:text-brand-600 transition">Scaling pilots</div><div class="text-[.8rem] text-ink-500 mt-0.5">Plan gating + Stripe Connect payouts</div></a>
+              <a href="#features" class="block group"><div class="font-bold text-ink-950 text-[.92rem] group-hover:text-brand-600 transition">India-first launch</div><div class="text-[.8rem] text-ink-500 mt-0.5">UPI autopay + GST invoicing</div></a>
+            </div>
+          </div>
+          <div class="rounded-xl p-5 bg-gradient-to-br from-brand-50 to-ink-50 border border-brand-100">
+            <div class="text-[11px] uppercase tracking-[.14em] text-brand-700 font-bold">India-first</div>
+            <h4 class="mt-2 font-extrabold text-ink-950 text-[1rem] leading-tight tracking-tight">INR via Razorpay, UPI autopay, GST invoicing.</h4>
+            <p class="mt-2 text-[.8rem] text-ink-600">In active build. Pilot builders shipping to India get priority.</p>
+            <a href="#" class="mt-4 inline-flex items-center gap-1 text-[.78rem] font-bold text-ink-950 hover:text-brand-600 transition">
+              Get on the list
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <div class="megapanel wrap py-9" data-panel="resources">
+        <div class="grid md:grid-cols-2 gap-x-10 gap-y-8 max-w-3xl">
+          <a href="#" class="block group"><div class="font-bold text-ink-950 text-[.95rem] group-hover:text-brand-600 transition">Documentation</div><div class="text-[.82rem] text-ink-500 mt-0.5">authorize() · debit() · webhooks</div></a>
+          <a href="#pricing" class="block group"><div class="font-bold text-ink-950 text-[.95rem] group-hover:text-brand-600 transition">Pricing</div><div class="text-[.82rem] text-ink-500 mt-0.5">3 plans, $0 for the pilot cohort</div></a>
+          <a href="https://github.com/nagarmohnish/revenue_tech" class="block group"><div class="font-bold text-ink-950 text-[.95rem] group-hover:text-brand-600 transition">GitHub</div><div class="text-[.82rem] text-ink-500 mt-0.5">github.com/nagarmohnish/revenue_tech</div></a>
+          <a href="#" class="block group"><div class="font-bold text-ink-950 text-[.95rem] group-hover:text-brand-600 transition">Strategy memo</div><div class="text-[.82rem] text-ink-500 mt-0.5">Why one wallet beats per-agent billing</div></a>
+        </div>
+      </div>
+
     </div>
-    <div>
-      <div class="text-[.72rem] uppercase tracking-[.14em] text-ink-500 font-semibold">Contact</div>
-      <ul class="mt-4 space-y-2.5">
-        <li><a href="mailto:hello@agentmint.com" class="hover:text-white">hello@agentmint.com</a></li>
-        <li><a href="#" class="hover:text-white">Sign in</a></li>
-        <li><a href="/build/signup" class="hover:text-white">Start building</a></li>
-      </ul>
-    </div>
-  </div>
-</footer>
+  </header>
+
+  <main>
+
+    <!-- ─────────── HERO ─────────── -->
+    <section class="hero-bg relative overflow-hidden">
+      <div class="relative wrap pt-20 pb-24 md:pt-24 md:pb-28">
+        <div class="grid lg:grid-cols-[1.05fr_1fr] gap-x-14 gap-y-14 items-center">
+
+          <div>
+            <div class="reveal inline-flex items-center gap-2 chip">
+              <span class="dot bg-brand-500 dot-pulse"></span>
+              Pilot cohort is open · $0 for first 6 builders
+            </div>
+            <h1 class="reveal h1 balance mt-6">
+              Billing for
+              <span id="rotor" class="text-brand-500 inline-block">AI agents.</span>
+            </h1>
+            <p class="reveal lead mt-6 max-w-xl">
+              One credit wallet. Two HTTP calls. Every agent you ship, in one place.
+            </p>
+            <div class="reveal mt-8 flex flex-wrap gap-3">
+              <a href="#" class="inline-flex items-center gap-1.5 text-[.95rem] font-semibold text-white bg-ink-950 hover:bg-ink-800 rounded-lg px-5 py-3 transition">
+                Start building
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+              </a>
+              <a href="#how" class="inline-flex items-center gap-1.5 text-[.95rem] font-semibold text-ink-800 bg-white border border-ink-200 hover:border-ink-400 rounded-lg px-5 py-3 transition">
+                See how it works
+              </a>
+            </div>
+          </div>
+
+          <div class="reveal">
+            <div class="card p-6 relative">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2 text-[.78rem] font-semibold text-ink-500 uppercase tracking-wider">
+                  <span class="dot bg-brand-500 dot-pulse"></span> Live customer wallet
+                </div>
+                <span class="mono text-[.74rem] text-ink-400">workspace_ac82</span>
+              </div>
+
+              <div class="mt-5 grid grid-cols-3 gap-2 text-center">
+                <div id="ph-authorize" class="phase-active mono text-[.7rem] font-semibold px-2 py-1.5 rounded-lg border transition-colors duration-300">authorize()</div>
+                <div id="ph-run"       class="phase-idle   mono text-[.7rem] font-semibold px-2 py-1.5 rounded-lg border transition-colors duration-300">run agent</div>
+                <div id="ph-debit"     class="phase-idle   mono text-[.7rem] font-semibold px-2 py-1.5 rounded-lg border transition-colors duration-300">debit()</div>
+              </div>
+              <div class="pipeline-track mt-3"></div>
+
+              <div class="mt-5 rounded-2xl border border-ink-100 p-4 bg-ink-50">
+                <div class="flex items-center justify-between text-[.78rem] text-ink-500 font-medium">
+                  <span>Credit balance</span>
+                  <span class="chip !py-0.5 !px-2 !text-[.72rem]"><span class="dot bg-brand-500"></span>Growth · 3,000/mo</span>
+                </div>
+                <div class="mt-1.5 flex items-end gap-2">
+                  <span id="bal-num" class="text-[2.6rem] leading-none font-extrabold tnum text-ink-950">2,184</span>
+                  <span class="text-ink-500 pb-1 font-medium">credits</span>
+                  <span id="bal-days" class="ml-auto text-[.78rem] text-ink-400 pb-1 tnum">~23 days</span>
+                </div>
+                <div class="mt-3 h-2 rounded-full bg-ink-200 overflow-hidden">
+                  <div id="bal-bar" class="h-full bg-brand-500 transition-all duration-500" style="width:73%"></div>
+                </div>
+              </div>
+
+              <div class="mt-5">
+                <div class="text-[.74rem] font-semibold text-ink-500 uppercase tracking-wider mb-2.5">Live agent calls</div>
+                <ul id="feed" class="space-y-1.5 text-[.86rem]">
+                  <li class="flex items-center justify-between rounded-md px-2 py-1 -mx-2"><span class="mono text-ink-700 truncate">writer · generate_doc</span><span class="text-coral-500 font-semibold tnum">−25</span></li>
+                  <li class="flex items-center justify-between rounded-md px-2 py-1 -mx-2"><span class="mono text-ink-700 truncate">analyzer · score_page</span><span class="text-coral-500 font-semibold tnum">−30</span></li>
+                  <li class="flex items-center justify-between rounded-md px-2 py-1 -mx-2"><span class="mono text-ink-700 truncate">scheduler · queue_task</span><span class="text-coral-500 font-semibold tnum">−12</span></li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ─────────── BUILT ON STRIP ─────────── -->
+    <section class="border-y border-ink-100 bg-white">
+      <div class="wrap py-8 flex flex-col md:flex-row items-center justify-between gap-5">
+        <div class="text-[12px] uppercase tracking-[.14em] text-ink-400 font-semibold">Built on the rails you trust</div>
+        <div class="flex flex-wrap items-center gap-x-8 gap-y-3 text-[.95rem] font-bold text-ink-500">
+          <span>Supabase</span><span>Stripe</span><span>Next.js</span><span>Razorpay</span><span>Vercel</span><span>PostHog</span><span>Resend</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ─────────── FEATURES ─────────── -->
+    <section id="features" class="bg-brand-50/40 border-b border-ink-100">
+      <div class="wrap py-20 md:py-24">
+        <div class="reveal max-w-2xl">
+          <div class="eyebrow">What you get</div>
+          <h2 class="h2 balance mt-4">Three primitives. <span class="text-brand-500">That's it.</span></h2>
+        </div>
+        <div class="mt-12 grid md:grid-cols-3 gap-5">
+          <div class="reveal card p-7">
+            <div class="w-10 h-10 rounded-xl bg-brand-500/10 flex items-center justify-center"><span class="w-2 h-2 rounded-full bg-brand-500"></span></div>
+            <h3 class="mt-5 font-extrabold text-ink-950 text-[1.1rem] tracking-tight">One wallet</h3>
+            <p class="mt-2 text-[14.5px] text-ink-600 leading-relaxed">Your customer buys credits once. They spend them across every agent you ship.</p>
+          </div>
+          <div class="reveal card p-7">
+            <div class="w-10 h-10 rounded-xl bg-brand-500/10 flex items-center justify-center"><span class="w-2 h-2 rounded-full bg-brand-500"></span></div>
+            <h3 class="mt-5 font-extrabold text-ink-950 text-[1.1rem] tracking-tight">Two HTTP calls</h3>
+            <p class="mt-2 text-[14.5px] text-ink-600 leading-relaxed">authorize() before, debit() after. No SDK. Any stack that speaks HTTPS.</p>
+          </div>
+          <div class="reveal card p-7">
+            <div class="w-10 h-10 rounded-xl bg-brand-500/10 flex items-center justify-center"><span class="w-2 h-2 rounded-full bg-brand-500"></span></div>
+            <h3 class="mt-5 font-extrabold text-ink-950 text-[1.1rem] tracking-tight">Per-agent attribution</h3>
+            <p class="mt-2 text-[14.5px] text-ink-600 leading-relaxed">Revenue, usage and burn — broken out by agent, in one dashboard.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ─────────── RESULTS ─────────── -->
+    <section class="bg-white">
+      <div class="wrap py-20 md:py-24">
+        <div class="reveal text-center max-w-2xl mx-auto">
+          <div class="eyebrow justify-center">Why builders pick AgentMint</div>
+          <h2 class="h2 balance mt-4">Numbers, honestly.</h2>
+          <p class="lead mt-4">No fabricated metrics. Just the shape of what you get on day one.</p>
+        </div>
+        <div class="mt-12 grid md:grid-cols-3 gap-5">
+          <div class="reveal rounded-2xl p-8 bg-brand-50/60 border border-brand-100">
+            <div class="text-[3rem] leading-none font-extrabold tracking-tight text-ink-950 tnum">~30 min</div>
+            <div class="mt-2 text-[14px] font-semibold text-brand-700">to instrument an agent</div>
+            <p class="mt-4 text-[14.5px] text-ink-600 leading-relaxed">Two HTTP calls plus one registry row. No SDK to vendor.</p>
+          </div>
+          <div class="reveal rounded-2xl p-8 bg-brand-50/60 border border-brand-100">
+            <div class="text-[3rem] leading-none font-extrabold tracking-tight text-ink-950 tnum">1 wallet</div>
+            <div class="mt-2 text-[14px] font-semibold text-brand-700">across your whole suite</div>
+            <p class="mt-4 text-[14.5px] text-ink-600 leading-relaxed">Per-agent attribution underneath — wallet on top.</p>
+          </div>
+          <div class="reveal rounded-2xl p-8 bg-brand-50/60 border border-brand-100">
+            <div class="text-[3rem] leading-none font-extrabold tracking-tight text-ink-950 tnum">$0</div>
+            <div class="mt-2 text-[14px] font-semibold text-brand-700">for the pilot cohort</div>
+            <p class="mt-4 text-[14.5px] text-ink-600 leading-relaxed">First six builders pay nothing while we harden Connect together.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ─────────── HOW IT WORKS ─────────── -->
+    <section id="how" class="bg-brand-50/40 border-y border-ink-100">
+      <div class="wrap py-20 md:py-24">
+        <div class="reveal max-w-2xl">
+          <div class="eyebrow">How it works</div>
+          <h2 class="h2 balance mt-4">Three steps. Then ship.</h2>
+        </div>
+
+        <div class="mt-12 grid lg:grid-cols-2 gap-8 items-start">
+          <ol class="space-y-3">
+            <li class="reveal card p-5 flex gap-5">
+              <div class="w-11 h-11 rounded-xl bg-brand-500 text-white font-extrabold flex items-center justify-center mono text-[.95rem] flex-shrink-0">01</div>
+              <div><h3 class="font-extrabold text-ink-950 tracking-tight">Register</h3><p class="mt-1 text-[14px] text-ink-600 leading-relaxed">Add each agent and its actions to the registry. One row per action.</p></div>
+            </li>
+            <li class="reveal card p-5 flex gap-5">
+              <div class="w-11 h-11 rounded-xl bg-brand-500 text-white font-extrabold flex items-center justify-center mono text-[.95rem] flex-shrink-0">02</div>
+              <div><h3 class="font-extrabold text-ink-950 tracking-tight">Authorize</h3><p class="mt-1 text-[14px] text-ink-600 leading-relaxed">POST /v1/authorize before the agent runs. Plan + balance checked atomically.</p></div>
+            </li>
+            <li class="reveal card p-5 flex gap-5">
+              <div class="w-11 h-11 rounded-xl bg-brand-500 text-white font-extrabold flex items-center justify-center mono text-[.95rem] flex-shrink-0">03</div>
+              <div><h3 class="font-extrabold text-ink-950 tracking-tight">Debit</h3><p class="mt-1 text-[14px] text-ink-600 leading-relaxed">POST /v1/debit on success. Idempotent by resource_id. Funnel events emitted.</p></div>
+            </li>
+          </ol>
+
+          <div class="reveal rounded-2xl overflow-hidden border border-ink-200 bg-ink-950 text-ink-50">
+            <div class="flex items-center gap-1.5 px-4 py-2.5 border-b border-ink-800">
+              <span class="w-2.5 h-2.5 rounded-full bg-ink-700"></span>
+              <span class="w-2.5 h-2.5 rounded-full bg-ink-700"></span>
+              <span class="w-2.5 h-2.5 rounded-full bg-ink-700"></span>
+              <span class="ml-3 mono text-[12px] text-ink-400">agent.ts</span>
+            </div>
+<pre class="mono text-[12.5px] leading-[1.7] px-5 py-5 overflow-auto"><code><span class="text-ink-400">// before the agent runs</span>
+await fetch('https://api.agentmint.com/v1/<span class="text-brand-300">authorize</span>', {
+  method: 'POST',
+  headers: { Authorization: 'Bearer am_live_…' },
+  body: JSON.stringify({ workspaceId, product: 'writer', action: 'generate_doc', cost: 25 }),
+});
+
+<span class="text-ink-400">// on success</span>
+await fetch('https://api.agentmint.com/v1/<span class="text-brand-300">debit</span>', {
+  method: 'POST',
+  headers: { Authorization: 'Bearer am_live_…' },
+  body: JSON.stringify({ workspaceId, product: 'writer', action: 'generate_doc', cost: 25, resourceId }),
+});</code></pre>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ─────────── PRICING ─────────── -->
+    <section id="pricing" class="bg-white">
+      <div class="wrap py-20 md:py-24">
+        <div class="reveal max-w-2xl">
+          <div class="eyebrow">Pricing</div>
+          <h2 class="h2 balance mt-4">Start free. Pay when you earn.</h2>
+        </div>
+
+        <div class="mt-12 grid md:grid-cols-3 gap-5">
+          <div class="reveal card p-7 flex flex-col">
+            <div class="text-[13px] font-semibold text-ink-500 uppercase tracking-wider">Pilot</div>
+            <div class="mt-3 flex items-baseline gap-1.5"><span class="text-[2.4rem] font-extrabold tracking-tight text-ink-950">$0</span><span class="text-[14px] text-ink-500">first cohort</span></div>
+            <ul class="mt-6 space-y-3 text-[14.5px] text-ink-700 flex-1">
+              <li class="flex gap-2.5 items-start"><svg class="mt-0.5" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#10a868" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span>Unlimited agents</span></li>
+              <li class="flex gap-2.5 items-start"><svg class="mt-0.5" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#10a868" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span>Up to 3 paying workspaces</span></li>
+              <li class="flex gap-2.5 items-start"><svg class="mt-0.5" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#10a868" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span>Direct line to the team</span></li>
+            </ul>
+            <a href="#" class="mt-7 inline-flex items-center justify-center gap-1.5 text-[14px] font-semibold rounded-lg px-4 py-2.5 transition bg-white text-ink-800 border border-ink-200 hover:border-ink-400">Apply</a>
+          </div>
+          <div class="reveal card p-7 flex flex-col !border-brand-500 !border-2 relative">
+            <span class="absolute -top-3 right-6 chip !bg-brand-500 !text-white !border-brand-500 !text-[11px]">Most popular</span>
+            <div class="text-[13px] font-semibold text-ink-500 uppercase tracking-wider">Starter</div>
+            <div class="mt-3 flex items-baseline gap-1.5"><span class="text-[2.4rem] font-extrabold tracking-tight text-ink-950">$49</span><span class="text-[14px] text-ink-500">/ month</span></div>
+            <ul class="mt-6 space-y-3 text-[14.5px] text-ink-700 flex-1">
+              <li class="flex gap-2.5 items-start"><svg class="mt-0.5" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#10a868" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span>Up to 25 workspaces</span></li>
+              <li class="flex gap-2.5 items-start"><svg class="mt-0.5" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#10a868" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span>Stripe Connect (USD)</span></li>
+              <li class="flex gap-2.5 items-start"><svg class="mt-0.5" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#10a868" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span>Email + Slack support</span></li>
+            </ul>
+            <a href="#" class="mt-7 inline-flex items-center justify-center gap-1.5 text-[14px] font-semibold rounded-lg px-4 py-2.5 transition bg-ink-950 text-white hover:bg-ink-800">Start free</a>
+          </div>
+          <div class="reveal card p-7 flex flex-col">
+            <div class="text-[13px] font-semibold text-ink-500 uppercase tracking-wider">Growth</div>
+            <div class="mt-3 flex items-baseline gap-1.5"><span class="text-[2.4rem] font-extrabold tracking-tight text-ink-950">$199</span><span class="text-[14px] text-ink-500">/ month</span></div>
+            <ul class="mt-6 space-y-3 text-[14.5px] text-ink-700 flex-1">
+              <li class="flex gap-2.5 items-start"><svg class="mt-0.5" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#10a868" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span>Unlimited workspaces</span></li>
+              <li class="flex gap-2.5 items-start"><svg class="mt-0.5" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#10a868" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span>INR / UPI / GST (in build)</span></li>
+              <li class="flex gap-2.5 items-start"><svg class="mt-0.5" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#10a868" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span>Priority pilot status</span></li>
+            </ul>
+            <a href="#" class="mt-7 inline-flex items-center justify-center gap-1.5 text-[14px] font-semibold rounded-lg px-4 py-2.5 transition bg-white text-ink-800 border border-ink-200 hover:border-ink-400">Start free</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ─────────── FAQ ─────────── -->
+    <section id="faq" class="bg-brand-50/40 border-y border-ink-100">
+      <div class="wrap py-20 md:py-24">
+        <div class="reveal max-w-2xl">
+          <div class="eyebrow">FAQ</div>
+          <h2 class="h2 balance mt-4">Quick answers.</h2>
+        </div>
+        <div class="mt-10 max-w-3xl divide-y divide-ink-100">
+          <div class="reveal py-6"><h3 class="font-extrabold text-ink-950 tracking-tight text-[1.02rem]">Do I need a specific stack?</h3><p class="mt-2 text-[14.5px] text-ink-600 leading-relaxed">No. Integration is two plain HTTP calls. Anything that speaks HTTPS works.</p></div>
+          <div class="reveal py-6"><h3 class="font-extrabold text-ink-950 tracking-tight text-[1.02rem]">How does payout work?</h3><p class="mt-2 text-[14.5px] text-ink-600 leading-relaxed">Through your own Stripe (USD now) or Razorpay/Cashfree (INR, next). AgentMint never holds the money.</p></div>
+          <div class="reveal py-6"><h3 class="font-extrabold text-ink-950 tracking-tight text-[1.02rem]">Is this the same as x402?</h3><p class="mt-2 text-[14.5px] text-ink-600 leading-relaxed">No. x402 lets agents pay autonomously. AgentMint lets humans pay for the agents you ship.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ─────────── CTA ─────────── -->
+    <section class="relative overflow-hidden bg-ink-950 text-white">
+      <div aria-hidden class="pointer-events-none absolute rounded-full" style="width:32rem;height:32rem;background:#10a868;top:-12rem;right:-8rem;filter:blur(80px);opacity:.35"></div>
+      <div class="relative wrap py-24 text-center">
+        <h2 class="reveal h2 balance text-white">Ship the billing. <span class="text-brand-400">Keep the focus on agents.</span></h2>
+        <div class="reveal mt-9 flex flex-wrap justify-center gap-3">
+          <a href="#" class="inline-flex items-center gap-1.5 text-[.95rem] font-semibold text-ink-950 bg-white hover:bg-ink-50 rounded-lg px-5 py-3 transition">
+            Start building
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+          </a>
+          <a href="#how" class="inline-flex items-center gap-1.5 text-[.95rem] font-semibold text-white border border-white/30 hover:border-white/70 rounded-lg px-5 py-3 transition">See the contract</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ─────────── FOOTER ─────────── -->
+    <footer class="bg-white border-t border-ink-100">
+      <div class="wrap py-10 flex flex-col md:flex-row items-center justify-between gap-4 text-[13px] text-ink-500">
+        <div class="flex items-center gap-2 font-extrabold text-ink-800">
+          <svg width="18" height="18" viewBox="0 0 28 28" fill="none" aria-hidden>
+            <rect x="2" y="2" width="24" height="24" rx="7" fill="#10a868"/>
+            <circle cx="14" cy="14" r="6" stroke="#fff" stroke-width="1.9" fill="none"/>
+            <path d="M14 10.2v7.6M11.6 12.6h4.8M11.6 15.4h4.8" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/>
+          </svg>
+          AgentMint
+        </div>
+        <div class="flex items-center gap-6">
+          <a href="#features" class="hover:text-ink-950 transition">Features</a>
+          <a href="#pricing" class="hover:text-ink-950 transition">Pricing</a>
+          <a href="#" class="hover:text-ink-950 transition">Get started</a>
+        </div>
+      </div>
+    </footer>
+
+  </main>
 
 <script>
-  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+(function() {
+  // ─── Mega-menu open/close ───
+  var hdr = document.getElementById('hdr');
+  var mega = document.getElementById('mega');
+  var triggers = document.querySelectorAll('.nav-trigger');
+  var panels   = document.querySelectorAll('.megapanel');
 
-  // nav scroll
-  const nav = document.getElementById('nav');
-  const onScroll = () => nav.classList.toggle('scrolled', window.scrollY > 8);
-  onScroll(); addEventListener('scroll', onScroll, {passive:true});
-
-  // reveal
-  if (reduce) {
-    document.querySelectorAll('.reveal').forEach(el => el.classList.add('in'));
-  } else {
-    const io = new IntersectionObserver((es) => {
-      es.forEach(e => { if (e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target);} });
-    }, {threshold:.14, rootMargin:'0px 0px -6% 0px'});
-    document.querySelectorAll('.reveal').forEach(el => io.observe(el));
-    setTimeout(() => document.querySelectorAll('.reveal:not(.in)').forEach(el => el.classList.add('in')), 1400);
+  function open(name) {
+    panels.forEach(function (p) { p.classList.toggle('open', p.getAttribute('data-panel') === name); });
+    triggers.forEach(function (t) { t.setAttribute('aria-expanded', t.getAttribute('data-menu') === name ? 'true' : 'false'); });
+    mega.style.display = 'block';
   }
+  function close() {
+    panels.forEach(function (p) { p.classList.remove('open'); });
+    triggers.forEach(function (t) { t.setAttribute('aria-expanded', 'false'); });
+    mega.style.display = 'none';
+  }
+  triggers.forEach(function (t) {
+    t.addEventListener('mouseenter', function () { open(t.getAttribute('data-menu')); });
+    t.addEventListener('focus',      function () { open(t.getAttribute('data-menu')); });
+    t.addEventListener('click', function (e) {
+      e.preventDefault();
+      var cur = t.getAttribute('aria-expanded') === 'true';
+      if (cur) close(); else open(t.getAttribute('data-menu'));
+    });
+  });
+  hdr.addEventListener('mouseleave', close);
 
-  // rotating headline word
-  if (!reduce) {
-    const rotor = document.getElementById('rotor');
-    const words = ['writer agent','RAG agent','voice agent','workflow agent','whole agent suite'];
-    let i = 0;
-    setInterval(() => {
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // ─── Rotor ───
+  var rotor = document.getElementById('rotor');
+  var words = ['AI agents.', 'writer agents.', 'RAG agents.', 'voice agents.', 'every agent.'];
+  if (rotor && !reduce) {
+    var i = 0;
+    setInterval(function () {
       i = (i + 1) % words.length;
       rotor.style.transition = 'opacity .25s ease, transform .25s ease';
-      rotor.style.opacity = '0'; rotor.style.transform = 'translateY(-6px)';
-      setTimeout(() => { rotor.textContent = words[i]; rotor.style.opacity = '1'; rotor.style.transform = 'none'; }, 250);
+      rotor.style.opacity = '0';
+      rotor.style.transform = 'translateY(-6px)';
+      setTimeout(function () {
+        rotor.textContent = words[i];
+        rotor.style.opacity = '1';
+        rotor.style.transform = 'none';
+      }, 250);
     }, 2200);
   }
 
-  // count-up stats
-  const fmt = (n, dec) => dec ? n.toFixed(dec) : Math.round(n).toLocaleString('en-US');
-  const animateCount = el => {
-    const to = parseFloat(el.dataset.to), dec = +(el.dataset.decimals||0), suf = el.dataset.suffix||'';
-    if (reduce) { el.textContent = fmt(to, dec) + suf; return; }
-    const dur = 1500, t0 = performance.now();
-    const tick = t => { const p = Math.min((t-t0)/dur,1); const e = 1-Math.pow(1-p,3);
-      el.textContent = fmt(to*e, dec) + suf; if (p<1) requestAnimationFrame(tick); };
-    requestAnimationFrame(tick);
-  };
-  const cio = new IntersectionObserver((es)=>{ es.forEach(e=>{ if(e.isIntersecting){ animateCount(e.target); cio.unobserve(e.target);} }); }, {threshold:.5});
-  document.querySelectorAll('.counter').forEach(el => cio.observe(el));
-
-  // copy code
-  const copyBtn = document.getElementById('copyBtn');
-  copyBtn?.addEventListener('click', async () => {
-    try { await navigator.clipboard.writeText(document.getElementById('code').innerText);
-      const l = document.getElementById('copyLabel'); l.textContent='Copied'; setTimeout(()=>l.textContent='Copy',1600);
-    } catch(e){}
-  });
-
-  // hero pipeline
+  // ─── Pipeline phase cycle ───
   if (!reduce) {
-    const b1=document.getElementById('b1'), b2=document.getElementById('b2'), b3=document.getElementById('b3');
-    const bal=document.getElementById('bal'), balbar=document.getElementById('balbar'), feed=document.getElementById('feed');
-    const on='bg-brand-500 text-white', dim='bg-ink-100 text-ink-500', ready='bg-brand-50 text-brand-700';
-    const samples=[['analyzer · score_page',30],['writer · generate_doc',45],['generator · create_post',2],['classifier · tag_intent',8],['scheduler · queue_task',12]];
-    let balance=1847, k=0;
-    const setBadge=(el,cls)=>{ el.className='step-badge mono text-[.72rem] font-semibold px-2 py-1.5 rounded-lg '+cls; };
-    const cycle = () => {
-      setBadge(b1, on); setBadge(b2, dim); setBadge(b3, dim);
-      setTimeout(()=>{ setBadge(b1, ready); setBadge(b2, on); }, 1500);
-      setTimeout(()=>{ setBadge(b2, dim); setBadge(b3, on); }, 2400);
-      setTimeout(()=>{
-        const [name,cost]=samples[k%samples.length]; k++;
-        balance=Math.max(0, balance-cost);
-        bal.textContent=balance.toLocaleString('en-US');
-        balbar.style.width=Math.max(4,(balance/2500*100)).toFixed(1)+'%';
-        const li=document.createElement('li');
-        li.className='flex items-center justify-between feed-flash';
-        li.innerHTML='<span class="mono text-ink-700 truncate">'+name+'</span><span class="flex items-center gap-2.5 text-ink-400 tnum"><span class="text-coral-500 font-semibold">-'+cost+'</span><span class="w-8 text-right">now</span></span>';
-        feed.insertBefore(li, feed.firstChild);
-        if (feed.children.length>3) feed.removeChild(feed.lastChild);
-        setBadge(b3, ready);
-      }, 2900);
-    };
-    cycle(); setInterval(cycle, 4000);
+    var phases = ['authorize', 'run', 'debit'];
+    var step = 0;
+    setInterval(function () {
+      step = (step + 1) % 3;
+      phases.forEach(function (p, idx) {
+        var el = document.getElementById('ph-' + p);
+        if (!el) return;
+        if (idx === step) { el.classList.remove('phase-idle'); el.classList.add('phase-active'); }
+        else              { el.classList.remove('phase-active'); el.classList.add('phase-idle'); }
+      });
+    }, 1400);
   }
+
+  // ─── Live wallet ───
+  var samples = [
+    { name: 'writer · generate_doc',   cost: 25 },
+    { name: 'analyzer · score_page',   cost: 30 },
+    { name: 'scheduler · queue_task',  cost: 12 },
+    { name: 'classifier · tag_intent', cost: 8  },
+    { name: 'writer · summarize',      cost: 18 },
+  ];
+  var balance = 2184;
+  var feed = document.getElementById('feed');
+  var balNum = document.getElementById('bal-num');
+  var balBar = document.getElementById('bal-bar');
+  var balDays = document.getElementById('bal-days');
+  if (feed && balNum && !reduce) {
+    var k = 0;
+    setInterval(function () {
+      var s = samples[k % samples.length]; k += 1;
+      balance = Math.max(0, balance - s.cost);
+      balNum.textContent = balance.toLocaleString('en-US');
+      balBar.style.width = Math.round((balance / 3000) * 100) + '%';
+      balDays.textContent = '~' + Math.max(1, Math.round(balance / 95)) + ' days';
+
+      var li = document.createElement('li');
+      li.className = 'flex items-center justify-between rounded-md px-2 py-1 -mx-2 feed-flash';
+      li.innerHTML = '<span class="mono text-ink-700 truncate">' + s.name + '</span><span class="text-coral-500 font-semibold tnum">−' + s.cost + '</span>';
+      feed.insertBefore(li, feed.firstChild);
+      while (feed.children.length > 3) feed.removeChild(feed.lastChild);
+      setTimeout(function () { li.classList.remove('feed-flash'); }, 700);
+    }, 4200);
+  }
+
+  // ─── Reveal on scroll ───
+  var rev = document.querySelectorAll('.reveal');
+  if (reduce) {
+    rev.forEach(function (el) { el.classList.add('in'); });
+  } else if ('IntersectionObserver' in window) {
+    var io = new IntersectionObserver(function (es) {
+      es.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } });
+    }, { threshold: 0.14, rootMargin: '0px 0px -6% 0px' });
+    rev.forEach(function (el) { io.observe(el); });
+    setTimeout(function () { document.querySelectorAll('.reveal:not(.in)').forEach(function (el) { el.classList.add('in'); }); }, 1400);
+  } else {
+    rev.forEach(function (el) { el.classList.add('in'); });
+  }
+})();
 </script>
 </body>
 </html>
