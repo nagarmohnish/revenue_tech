@@ -1,0 +1,701 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>AgentMint · Provider dashboard</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        colors: {
+          /* Paid-inspired palette: cream paper bg + bright lime accent + deep forest dark */
+          cream:  { DEFAULT:'#ebe9df', 50:'#f4f3ec', 100:'#ebe9df', 200:'#dcdacd', 300:'#c2bfb0' },
+          forest: { DEFAULT:'#0a1b12', 950:'#06120b', 900:'#0a1b12', 800:'#13291e', 700:'#1d3b2c', 600:'#2a4d3a' },
+          lime:   { DEFAULT:'#b5e861', 300:'#cdee8c', 400:'#bce772', 500:'#b5e861', 600:'#9fd446' },
+          brand:  { 500:'#10a868', 600:'#0a8a55', 700:'#0a6e45' },
+          ink:    { 950:'#0a1b12', 900:'#13291e', 800:'#1d3b2c', 700:'#2a4d3a', 600:'#3d5d4c', 500:'#5d6e63', 400:'#8a9b91', 300:'#b8c5bd', 200:'#d4ddd6', 100:'#e8ede9', 50:'#f1f4f1' },
+          coral:  { 400:'#ff8a5c', 500:'#f2683c', 600:'#dc4f23' },
+          amber:  { 50:'#fef5e3', 600:'#c98a14', 700:'#8a5b09' }
+        },
+        fontFamily: {
+          sans: ['Plus Jakarta Sans','ui-sans-serif','system-ui','sans-serif'],
+          mono: ['JetBrains Mono','ui-monospace','monospace']
+        }
+      }
+    }
+  }
+</script>
+<style>
+  body { font-family:'Plus Jakarta Sans',system-ui,sans-serif; color:#0a1b12; background:#ebe9df; -webkit-font-smoothing:antialiased; }
+  .mono{font-family:'JetBrains Mono',monospace;}
+  .tnum{font-variant-numeric:tabular-nums;}
+  .tracking-tightest{ letter-spacing:-0.035em; }
+
+  /* Paper dot grid */
+  .paper-dots{
+    background-image: radial-gradient(circle, rgba(10,27,18,.07) 1px, transparent 1px);
+    background-size: 22px 22px;
+  }
+
+  /* Card surfaces */
+  .card { background:#fff; border:1px solid #d4ddd6; border-radius:14px; }
+  .card-paper { background:#f4f3ec; border:1px solid #d4ddd6; border-radius:14px; }
+  .card-dark { background:#0a1b12; color:#fff; border:1px solid #13291e; border-radius:14px; }
+  .card-dark .label { color:#8a9b91; }
+
+  /* Lime button (paid.ai signature) */
+  .btn-lime { background:#b5e861; color:#0a1b12; padding:.6rem 1rem; border-radius:8px; font-weight:800; font-size:.86rem; display:inline-flex; align-items:center; gap:.45rem; transition:.14s; border:none; cursor:pointer; letter-spacing:-.005em; }
+  .btn-lime:hover { background:#9fd446; }
+  .btn-dark { background:#0a1b12; color:#fff; padding:.6rem 1rem; border-radius:8px; font-weight:700; font-size:.86rem; display:inline-flex; align-items:center; gap:.45rem; transition:.14s; }
+  .btn-dark:hover { background:#13291e; }
+  .btn-line { background:#fff; color:#0a1b12; padding:.6rem 1rem; border-radius:8px; border:1px solid #b8c5bd; font-weight:600; font-size:.86rem; display:inline-flex; align-items:center; gap:.45rem; transition:.14s; }
+  .btn-line:hover { border-color:#0a1b12; }
+
+  /* Pills */
+  .chip { display:inline-flex; align-items:center; gap:.35rem; font-size:.66rem; font-weight:800; padding:.18rem .5rem; border-radius:999px; letter-spacing:.04em; text-transform:uppercase; }
+  .chip-lime { background:#b5e861; color:#0a1b12; }
+  .chip-paper { background:#f4f3ec; color:#1d3b2c; border:1px solid #d4ddd6; }
+  .chip-coral { background:#fce8e1; color:#a4391d; border:1px solid #f4b9a3; }
+  .chip-dark { background:#13291e; color:#cdee8c; }
+
+  /* Status dot */
+  .dot { width:.42rem; height:.42rem; border-radius:999px; }
+  @keyframes pulseDot { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.4;transform:scale(.75)} }
+  .pulse { animation:pulseDot 1.6s ease-in-out infinite; }
+
+  /* Eyebrow label */
+  .eyebrow { font-size:.66rem; letter-spacing:.14em; text-transform:uppercase; font-weight:800; color:#5d6e63; }
+
+  /* Crosshair corner marker (decorative, paid.ai uses these on grid intersections) */
+  .crosshair{ position:absolute; width:14px; height:14px; opacity:.55; }
+  .crosshair::before, .crosshair::after { content:""; position:absolute; background:#0a1b12; }
+  .crosshair::before{ left:50%; top:0; transform:translateX(-50%); width:1px; height:14px; }
+  .crosshair::after { top:50%; left:0; transform:translateY(-50%); height:1px; width:14px; }
+
+  /* Sidebar nav */
+  .navlink { display:flex; align-items:center; gap:.6rem; padding:.5rem .65rem; border-radius:7px; font-size:.85rem; font-weight:600; color:#3d5d4c; transition:.14s; }
+  .navlink:hover { background:#f4f3ec; color:#0a1b12; }
+  .navlink.active { background:#0a1b12; color:#fff; }
+  .navlink.active svg { color:#b5e861; }
+
+  /* Delta badges */
+  .delta { display:inline-flex; align-items:center; gap:.15rem; font-size:.66rem; font-weight:800; padding:.12rem .42rem; border-radius:5px; font-family:'JetBrains Mono',monospace; letter-spacing:.02em; }
+  .delta-up { background:#0a1b12; color:#b5e861; }
+  .delta-flat { background:#e8ede9; color:#3d5d4c; }
+  .delta-down { background:#fce8e1; color:#a4391d; }
+
+  /* Scrollbar */
+  .scrollbar-thin::-webkit-scrollbar { width:6px; height:6px; }
+  .scrollbar-thin::-webkit-scrollbar-thumb { background:#c2bfb0; border-radius:6px; }
+  .scrollbar-thin::-webkit-scrollbar-track { background:transparent; }
+
+  /* Feed animation */
+  @keyframes feedIn{from{opacity:0;transform:translateY(-3px)}to{opacity:1;transform:none}}
+  .feed-in{animation:feedIn .5s ease-out;}
+</style>
+</head>
+<body class="min-h-screen">
+
+<div class="flex min-h-screen">
+
+  <!-- ═════ SIDEBAR ═════ -->
+  <aside class="hidden lg:flex flex-col w-60 bg-white border-r border-ink-200 flex-shrink-0">
+    <!-- Logo + tiny mark -->
+    <div class="px-5 py-4 border-b border-ink-200 flex items-center justify-between">
+      <a href="/" class="flex items-center gap-2 font-extrabold text-[1.05rem] text-ink-950">
+        <svg width="26" height="26" viewBox="0 0 28 28" fill="none">
+          <rect x="2" y="2" width="24" height="24" rx="7" fill="#0a1b12" />
+          <circle cx="14" cy="14" r="6" stroke="#b5e861" stroke-width="1.9" fill="none" />
+          <path d="M14 10.2v7.6M11.6 12.6h4.8M11.6 15.4h4.8" stroke="#b5e861" stroke-width="1.6" stroke-linecap="round" />
+        </svg>
+        <span>Agent<span class="text-lime-500">Mint</span></span>
+      </a>
+      <span class="chip chip-paper !text-[.55rem] !py-0">v2</span>
+    </div>
+
+    <!-- Account switcher -->
+    <div class="px-3 pt-4 pb-2">
+      <button class="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg border border-ink-200 hover:border-ink-700 transition-colors text-left bg-cream/40">
+        <span class="w-7 h-7 rounded-md bg-forest text-lime-500 font-bold flex items-center justify-center text-[.78rem]">SL</span>
+        <div class="flex-1 min-w-0">
+          <div class="text-[.78rem] font-extrabold text-ink-950 truncate">Stately Labs</div>
+          <div class="text-[.66rem] mono text-ink-500 truncate">stately-labs · provider</div>
+        </div>
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#5d6e63" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="flex-shrink-0"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+    </div>
+
+    <!-- Nav -->
+    <nav class="px-3 py-3 space-y-0.5 flex-1 overflow-auto scrollbar-thin">
+      <div class="eyebrow px-2 pt-3 pb-1.5">Provider</div>
+      <a class="navlink active" href="#"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg> Overview</a>
+      <a class="navlink" href="#"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg> Agents <span class="ml-auto chip chip-paper !text-[.6rem] !py-0">5</span></a>
+      <a class="navlink" href="#"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg> Customers <span class="ml-auto text-[.66rem] mono text-ink-400">47</span></a>
+      <a class="navlink" href="#"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/></svg> Revenue</a>
+      <a class="navlink" href="#"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/></svg> Plans</a>
+
+      <div class="eyebrow px-2 pt-4 pb-1.5">Developer</div>
+      <a class="navlink" href="#"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg> API keys</a>
+      <a class="navlink" href="#"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg> Integration</a>
+      <a class="navlink" href="#"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Logs</a>
+      <a class="navlink" href="#"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg> Payments <span class="ml-auto chip chip-coral !text-[.58rem] !py-0">setup</span></a>
+
+      <div class="eyebrow px-2 pt-4 pb-1.5">Operations</div>
+      <a class="navlink" href="#"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg> Funnel events</a>
+      <a class="navlink" href="#"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg> Webhooks</a>
+      <a class="navlink" href="#"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg> Settings</a>
+    </nav>
+
+    <!-- Bottom: user profile -->
+    <div class="px-3 py-3 border-t border-ink-200">
+      <button class="w-full flex items-center gap-2.5 px-2 py-1.5 rounded-lg hover:bg-cream">
+        <span class="w-7 h-7 rounded-full bg-forest text-lime-500 font-extrabold flex items-center justify-center text-[.74rem]">M</span>
+        <div class="flex-1 min-w-0 text-left">
+          <div class="text-[.78rem] font-extrabold text-ink-950 truncate">Mohnish</div>
+          <div class="text-[.66rem] text-ink-500 truncate">Owner</div>
+        </div>
+      </button>
+    </div>
+  </aside>
+
+  <!-- ═════ MAIN ═════ -->
+  <div class="flex-1 min-w-0 flex flex-col">
+
+    <!-- Announcement bar (paid.ai inspired) -->
+    <div class="bg-forest text-white text-center text-[.78rem] py-2 px-4">
+      <span class="inline-flex items-center gap-2">
+        <span class="inline-flex items-center gap-1.5 bg-coral-500/15 text-coral-400 font-extrabold px-2 py-0.5 rounded text-[.65rem] tracking-wider"><span class="dot bg-coral-500"></span>NEW</span>
+        <span class="text-ink-200">India settlement (INR · UPI · GST) is now in build · ETA Q3</span>
+        <a class="text-lime-500 font-semibold hover:underline" href="#">See the roadmap →</a>
+      </span>
+    </div>
+
+    <!-- Top bar -->
+    <header class="h-14 border-b border-ink-200 bg-white px-5 flex items-center justify-between gap-4 sticky top-0 z-20">
+      <div class="flex items-center gap-2 text-[.86rem]">
+        <span class="text-ink-400">Provider</span>
+        <span class="text-ink-300">·</span>
+        <span class="text-ink-950 font-extrabold">Overview</span>
+        <span class="text-ink-300 mx-1">·</span>
+        <span class="mono text-[.72rem] text-ink-500">Last 30 days</span>
+      </div>
+      <div class="flex items-center gap-3">
+        <button class="hidden md:inline-flex items-center gap-2 px-3 py-1.5 border border-ink-200 rounded-md text-[.76rem] text-ink-600 hover:border-ink-700">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <span class="text-ink-400">Search · </span><span class="mono text-[.7rem]">⌘K</span>
+        </button>
+        <button class="relative w-8 h-8 rounded-md border border-ink-200 hover:border-ink-700 flex items-center justify-center text-ink-600">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+          <span class="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-coral-500 border border-white"></span>
+        </button>
+        <a class="btn-lime" href="#">Connect Stripe →</a>
+      </div>
+    </header>
+
+    <!-- Content -->
+    <main class="flex-1 overflow-auto paper-dots relative">
+
+      <!-- Decorative crosshairs at content edges -->
+      <div class="crosshair" style="left:4px;top:4px;"></div>
+      <div class="crosshair" style="right:4px;top:4px;"></div>
+
+      <div class="p-5 lg:p-7 space-y-5 max-w-[1400px] w-full mx-auto">
+
+        <!-- ═════ HERO HEADLINE (two-tone paid.ai style) ═════ -->
+        <section class="pt-3 pb-2">
+          <h1 class="font-extrabold tracking-tightest leading-[1.04] text-[2.1rem] md:text-[2.5rem]">
+            Your agents are billing.
+            <span class="block text-forest/40">Now let's get the money in the bank.</span>
+          </h1>
+          <p class="mt-3 text-[.95rem] text-ink-600 max-w-2xl">
+            Stately Labs is on a <strong class="text-ink-950">5-agent</strong> suite with <strong class="text-ink-950">47 paying customers</strong>. Onboarding is <strong class="text-ink-950">3 of 4</strong> complete — Stripe Connect is your last unlock.
+          </p>
+        </section>
+
+        <!-- ═════ KPI ROW ═════ -->
+        <section class="grid grid-cols-2 md:grid-cols-4 gap-3">
+
+          <!-- MRR (LIGHT) -->
+          <div class="card p-5 relative">
+            <div class="flex items-center justify-between">
+              <div class="eyebrow !text-[.6rem]">MRR</div>
+              <span class="delta delta-up">▲ 12.4%</span>
+            </div>
+            <div class="mt-2 font-extrabold text-[2rem] tnum leading-none tracking-tightest">$2,847</div>
+            <div class="mt-1.5 text-[.72rem] text-ink-500">vs $2,533 last month</div>
+            <svg viewBox="0 0 140 30" class="mt-3 w-full h-7">
+              <path d="M0,22 L14,20 L28,21 L42,17 L56,18 L70,14 L84,12 L98,13 L112,9 L126,7 L140,4" fill="none" stroke="#0a1b12" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M0,22 L14,20 L28,21 L42,17 L56,18 L70,14 L84,12 L98,13 L112,9 L126,7 L140,4 L140,30 L0,30 Z" fill="#b5e861" opacity=".35"/>
+            </svg>
+          </div>
+
+          <!-- Active customers (LIGHT) -->
+          <div class="card p-5">
+            <div class="flex items-center justify-between">
+              <div class="eyebrow !text-[.6rem]">Active customers</div>
+              <span class="delta delta-up">▲ 8</span>
+            </div>
+            <div class="mt-2 font-extrabold text-[2rem] tnum leading-none tracking-tightest">47</div>
+            <div class="mt-1.5 text-[.72rem] text-ink-500">12 trial · 28 starter · 7 growth</div>
+            <div class="mt-3 flex gap-0.5 h-6 items-end">
+              <div class="flex-1 bg-ink-200 rounded-sm" style="height:30%"></div>
+              <div class="flex-1 bg-ink-200 rounded-sm" style="height:42%"></div>
+              <div class="flex-1 bg-ink-200 rounded-sm" style="height:38%"></div>
+              <div class="flex-1 bg-lime-300 rounded-sm" style="height:55%"></div>
+              <div class="flex-1 bg-lime-300 rounded-sm" style="height:48%"></div>
+              <div class="flex-1 bg-lime-400 rounded-sm" style="height:60%"></div>
+              <div class="flex-1 bg-lime-400 rounded-sm" style="height:72%"></div>
+              <div class="flex-1 bg-lime-500 rounded-sm" style="height:80%"></div>
+              <div class="flex-1 bg-lime-500 rounded-sm" style="height:68%"></div>
+              <div class="flex-1 bg-lime-600 rounded-sm" style="height:92%"></div>
+            </div>
+          </div>
+
+          <!-- Calls 24h (LIGHT) -->
+          <div class="card p-5">
+            <div class="flex items-center justify-between">
+              <div class="eyebrow !text-[.6rem]">Calls · 24h</div>
+              <span class="delta delta-up">▲ 6.1%</span>
+            </div>
+            <div class="mt-2 font-extrabold text-[2rem] tnum leading-none tracking-tightest">1,284</div>
+            <div class="mt-1.5 text-[.72rem] text-ink-500">18 ms avg · 0 negative balances</div>
+            <div class="mt-3 flex items-center gap-2">
+              <span class="dot pulse" style="background:#b5e861"></span>
+              <span class="text-[.72rem] text-ink-700 mono">writer · generate_doc</span>
+              <span class="ml-auto text-[.66rem] text-ink-400 mono">now</span>
+            </div>
+          </div>
+
+          <!-- Trial → Paid (DARK CARD — paid.ai signature treatment) -->
+          <div class="card-dark p-5 relative overflow-hidden">
+            <div class="absolute -right-8 -bottom-8 w-32 h-32 rounded-full" style="background:radial-gradient(circle, rgba(181,232,97,.18), transparent 70%);"></div>
+            <div class="relative">
+              <div class="flex items-center justify-between">
+                <div class="eyebrow !text-[.6rem] !text-lime-500">Trial → Paid</div>
+                <span class="chip chip-lime !text-[.58rem]">illustrative</span>
+              </div>
+              <div class="mt-2 font-extrabold text-[2rem] tnum leading-none tracking-tightest text-lime-500">31<span class="text-lime-500/50 text-[1.1rem]">%</span></div>
+              <div class="mt-1.5 text-[.72rem] text-ink-300">152 trials in last 30d · 47 converted</div>
+              <div class="mt-3 grid grid-cols-4 gap-1">
+                <div class="h-2 rounded-sm bg-lime-500" title="trial_started"></div>
+                <div class="h-2 rounded-sm bg-lime-500/70" title="first_agent_used"></div>
+                <div class="h-2 rounded-sm bg-lime-500/45" title="checkout_started"></div>
+                <div class="h-2 rounded-sm" style="background:#ff8a5c" title="payment_completed"></div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ═════ ROW 2: Revenue chart (wide) + Onboarding (DARK) ═════ -->
+        <section class="grid lg:grid-cols-3 gap-3">
+
+          <!-- Revenue chart (LIGHT, wide) -->
+          <div class="card p-5 lg:col-span-2">
+            <div class="flex items-start justify-between gap-3">
+              <div>
+                <div class="eyebrow">Revenue · 30 days</div>
+                <div class="mt-1 flex items-end gap-2">
+                  <div class="font-extrabold text-[1.85rem] tnum tracking-tightest leading-none">$2,847</div>
+                  <span class="delta delta-up mb-1">▲ 12.4%</span>
+                </div>
+              </div>
+              <div class="flex items-center gap-0.5 text-[.7rem] mono">
+                <button class="px-2 py-1 rounded text-ink-400 hover:text-ink-950">7d</button>
+                <button class="px-2 py-1 rounded bg-forest text-lime-500 font-bold">30d</button>
+                <button class="px-2 py-1 rounded text-ink-400 hover:text-ink-950">90d</button>
+                <button class="px-2 py-1 rounded text-ink-400 hover:text-ink-950">All</button>
+              </div>
+            </div>
+
+            <div class="mt-5">
+              <svg viewBox="0 0 720 200" class="w-full h-44">
+                <line x1="0" y1="50"  x2="720" y2="50"  stroke="#e8ede9"/>
+                <line x1="0" y1="100" x2="720" y2="100" stroke="#e8ede9"/>
+                <line x1="0" y1="150" x2="720" y2="150" stroke="#e8ede9"/>
+                <defs>
+                  <linearGradient id="rev" x1="0" x2="0" y1="0" y2="1">
+                    <stop offset="0%" stop-color="#b5e861" stop-opacity=".55"/>
+                    <stop offset="100%" stop-color="#b5e861" stop-opacity="0"/>
+                  </linearGradient>
+                </defs>
+                <path d="M0,160 L24,158 L48,150 L72,155 L96,148 L120,140 L144,135 L168,130 L192,138 L216,128 L240,122 L264,118 L288,124 L312,115 L336,108 L360,114 L384,102 L408,98 L432,108 L456,90 L480,84 L504,92 L528,78 L552,82 L576,68 L600,72 L624,58 L648,52 L672,42 L696,38 L720,30 L720,200 L0,200 Z" fill="url(#rev)"/>
+                <path d="M0,160 L24,158 L48,150 L72,155 L96,148 L120,140 L144,135 L168,130 L192,138 L216,128 L240,122 L264,118 L288,124 L312,115 L336,108 L360,114 L384,102 L408,98 L432,108 L456,90 L480,84 L504,92 L528,78 L552,82 L576,68 L600,72 L624,58 L648,52 L672,42 L696,38 L720,30"
+                      fill="none" stroke="#0a1b12" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                <circle cx="600" cy="72" r="5" fill="#b5e861" stroke="#0a1b12" stroke-width="2"/>
+                <line x1="600" y1="0" x2="600" y2="200" stroke="#0a1b12" stroke-dasharray="3 3" stroke-width="1" opacity=".35"/>
+              </svg>
+              <div class="mt-2 flex justify-between text-[.62rem] mono text-ink-400">
+                <span>May 1</span><span>May 8</span><span>May 15</span><span>May 22</span><span>May 30</span>
+              </div>
+            </div>
+
+            <div class="mt-4 pt-4 border-t border-ink-200 grid grid-cols-3 gap-4">
+              <div>
+                <div class="text-[.68rem] text-ink-500">Subscriptions</div>
+                <div class="font-extrabold text-ink-950 tnum mt-0.5 text-[1rem]">$2,253</div>
+                <span class="delta delta-up !text-[.6rem]">▲ 9%</span>
+              </div>
+              <div>
+                <div class="text-[.68rem] text-ink-500">Top-ups</div>
+                <div class="font-extrabold text-ink-950 tnum mt-0.5 text-[1rem]">$594</div>
+                <span class="delta delta-up !text-[.6rem]">▲ 28%</span>
+              </div>
+              <div>
+                <div class="text-[.68rem] text-ink-500">Refunds</div>
+                <div class="font-extrabold text-ink-950 tnum mt-0.5 text-[1rem]">$0</div>
+                <span class="delta delta-flat !text-[.6rem]">▶ 0</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Onboarding (DARK CARD — paid.ai signature) -->
+          <div class="card-dark p-5 flex flex-col relative overflow-hidden">
+            <div class="absolute -left-10 -top-10 w-40 h-40 rounded-full" style="background:radial-gradient(circle, rgba(181,232,97,.12), transparent 65%);"></div>
+
+            <div class="relative flex items-center justify-between">
+              <div class="eyebrow !text-lime-500">Onboarding</div>
+              <span class="text-[.72rem] mono font-extrabold text-lime-500">3 / 4</span>
+            </div>
+            <div class="relative mt-3 h-1.5 rounded-full overflow-hidden" style="background:#13291e;">
+              <div class="h-full bg-lime-500" style="width:75%"></div>
+            </div>
+
+            <ol class="relative mt-5 space-y-3 flex-1">
+              <li class="flex items-start gap-2.5">
+                <span class="mt-0.5 w-5 h-5 rounded-full bg-lime-500 text-forest flex items-center justify-center text-[.7rem] flex-shrink-0 font-extrabold">✓</span>
+                <div>
+                  <div class="text-[.84rem] font-extrabold text-white">Register agents</div>
+                  <div class="text-[.72rem] text-ink-300">5 in the registry</div>
+                </div>
+              </li>
+              <li class="flex items-start gap-2.5">
+                <span class="mt-0.5 w-5 h-5 rounded-full bg-lime-500 text-forest flex items-center justify-center text-[.7rem] flex-shrink-0 font-extrabold">✓</span>
+                <div>
+                  <div class="text-[.84rem] font-extrabold text-white">Generate API key</div>
+                  <div class="text-[.72rem] text-ink-300">2 active (prod + staging)</div>
+                </div>
+              </li>
+              <li class="flex items-start gap-2.5">
+                <span class="mt-0.5 w-5 h-5 rounded-full bg-lime-500 text-forest flex items-center justify-center text-[.7rem] flex-shrink-0 font-extrabold">✓</span>
+                <div>
+                  <div class="text-[.84rem] font-extrabold text-white">Ship first call</div>
+                  <div class="text-[.72rem] text-ink-300">28,402 calls billed lifetime</div>
+                </div>
+              </li>
+              <li class="flex items-start gap-2.5">
+                <span class="mt-0.5 w-5 h-5 rounded-full border-2 border-coral-500 flex-shrink-0"></span>
+                <div class="flex-1">
+                  <div class="text-[.84rem] font-extrabold text-white">Connect Stripe <span class="chip chip-coral !text-[.55rem] ml-1">last step</span></div>
+                  <div class="text-[.72rem] text-ink-300">Customers can't pay you yet.</div>
+                  <a class="mt-1.5 inline-flex items-center gap-1 text-[.74rem] font-bold text-lime-500 hover:text-lime-300" href="#">Open Connect setup →</a>
+                </div>
+              </li>
+            </ol>
+
+            <div class="relative mt-5 pt-4 border-t border-forest-700">
+              <div class="text-[.6rem] uppercase tracking-[.14em] font-extrabold text-lime-500">Up next on our build queue</div>
+              <div class="mt-2 flex flex-wrap gap-1.5">
+                <span class="chip chip-dark">India · INR via Razorpay</span>
+                <span class="chip chip-dark">UPI autopay</span>
+                <span class="chip chip-dark">GST invoices</span>
+              </div>
+              <p class="mt-2 text-[.7rem] text-ink-400 leading-relaxed">India settlement is priority #2 right behind Connect.</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- ═════ ROW 3: Top agents table + Live feed (DARK) ═════ -->
+        <section class="grid lg:grid-cols-3 gap-3">
+
+          <!-- Top agents -->
+          <div class="card p-5 lg:col-span-2">
+            <div class="flex items-center justify-between">
+              <div>
+                <div class="eyebrow">Top agents · revenue contribution</div>
+                <p class="text-[.78rem] text-ink-500 mt-0.5">Last 30 days, all customers.</p>
+              </div>
+              <a class="text-[.74rem] font-extrabold text-forest hover:text-lime-600" href="#">View all →</a>
+            </div>
+            <table class="w-full mt-4 text-[.85rem]">
+              <thead class="text-[.62rem] uppercase tracking-[.12em] font-extrabold text-ink-400 border-b border-ink-200">
+                <tr>
+                  <th class="text-left font-extrabold py-2.5">Agent · action</th>
+                  <th class="text-right font-extrabold py-2.5">Calls</th>
+                  <th class="text-right font-extrabold py-2.5">Credits</th>
+                  <th class="text-right font-extrabold py-2.5">Revenue</th>
+                  <th class="text-right font-extrabold py-2.5 w-32">Share</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="border-b border-ink-100">
+                  <td class="py-3">
+                    <div class="flex items-center gap-2.5">
+                      <span class="w-7 h-7 rounded-md bg-lime-500/30 text-forest flex items-center justify-center"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/><path d="M2 2l7.586 7.586"/><circle cx="11" cy="11" r="2"/></svg></span>
+                      <div>
+                        <div class="font-extrabold text-ink-950">writer</div>
+                        <div class="text-[.7rem] mono text-ink-500">generate_doc · 25 cr</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td class="text-right tnum text-ink-700 font-bold">12,840</td>
+                  <td class="text-right tnum text-ink-700 font-bold">321,000</td>
+                  <td class="text-right tnum text-ink-950 font-extrabold">$1,287</td>
+                  <td class="py-3 pl-2">
+                    <div class="flex items-center gap-2">
+                      <div class="flex-1 h-2 rounded-full bg-ink-100 overflow-hidden"><div class="h-full rounded-full bg-lime-500" style="width:45%"></div></div>
+                      <span class="text-[.72rem] mono text-ink-700 w-9 text-right font-extrabold">45%</span>
+                    </div>
+                  </td>
+                </tr>
+                <tr class="border-b border-ink-100">
+                  <td class="py-3">
+                    <div class="flex items-center gap-2.5">
+                      <span class="w-7 h-7 rounded-md bg-lime-500/30 text-forest flex items-center justify-center"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span>
+                      <div>
+                        <div class="font-extrabold text-ink-950">analyzer</div>
+                        <div class="text-[.7rem] mono text-ink-500">score_page · 30 cr</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td class="text-right tnum text-ink-700 font-bold">6,512</td>
+                  <td class="text-right tnum text-ink-700 font-bold">195,360</td>
+                  <td class="text-right tnum text-ink-950 font-extrabold">$797</td>
+                  <td class="py-3 pl-2">
+                    <div class="flex items-center gap-2">
+                      <div class="flex-1 h-2 rounded-full bg-ink-100 overflow-hidden"><div class="h-full rounded-full bg-lime-500" style="width:28%"></div></div>
+                      <span class="text-[.72rem] mono text-ink-700 w-9 text-right font-extrabold">28%</span>
+                    </div>
+                  </td>
+                </tr>
+                <tr class="border-b border-ink-100">
+                  <td class="py-3">
+                    <div class="flex items-center gap-2.5">
+                      <span class="w-7 h-7 rounded-md bg-lime-500/30 text-forest flex items-center justify-center"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span>
+                      <div>
+                        <div class="font-extrabold text-ink-950">scheduler</div>
+                        <div class="text-[.7rem] mono text-ink-500">queue_task · 12 cr</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td class="text-right tnum text-ink-700 font-bold">10,840</td>
+                  <td class="text-right tnum text-ink-700 font-bold">130,080</td>
+                  <td class="text-right tnum text-ink-950 font-extrabold">$512</td>
+                  <td class="py-3 pl-2">
+                    <div class="flex items-center gap-2">
+                      <div class="flex-1 h-2 rounded-full bg-ink-100 overflow-hidden"><div class="h-full rounded-full bg-lime-500" style="width:18%"></div></div>
+                      <span class="text-[.72rem] mono text-ink-700 w-9 text-right font-extrabold">18%</span>
+                    </div>
+                  </td>
+                </tr>
+                <tr class="border-b border-ink-100">
+                  <td class="py-3">
+                    <div class="flex items-center gap-2.5">
+                      <span class="w-7 h-7 rounded-md bg-lime-500/30 text-forest flex items-center justify-center"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/></svg></span>
+                      <div>
+                        <div class="font-extrabold text-ink-950">classifier</div>
+                        <div class="text-[.7rem] mono text-ink-500">tag_intent · 8 cr</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td class="text-right tnum text-ink-700 font-bold">8,201</td>
+                  <td class="text-right tnum text-ink-700 font-bold">65,608</td>
+                  <td class="text-right tnum text-ink-950 font-extrabold">$182</td>
+                  <td class="py-3 pl-2">
+                    <div class="flex items-center gap-2">
+                      <div class="flex-1 h-2 rounded-full bg-ink-100 overflow-hidden"><div class="h-full rounded-full bg-lime-500" style="width:6%"></div></div>
+                      <span class="text-[.72rem] mono text-ink-700 w-9 text-right font-extrabold">6%</span>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="py-3">
+                    <div class="flex items-center gap-2.5">
+                      <span class="w-7 h-7 rounded-md bg-ink-100 text-ink-400 flex items-center justify-center border border-dashed border-ink-300"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></span>
+                      <div>
+                        <div class="font-extrabold text-ink-500">summarizer <span class="chip chip-paper !text-[.55rem] ml-1">just added</span></div>
+                        <div class="text-[.7rem] mono text-ink-400">summarize_doc · 10 cr</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td class="text-right tnum text-ink-400">2</td>
+                  <td class="text-right tnum text-ink-400">20</td>
+                  <td class="text-right tnum text-ink-400">—</td>
+                  <td class="py-3 pl-2">
+                    <div class="flex items-center gap-2">
+                      <div class="flex-1 h-2 rounded-full bg-ink-100 overflow-hidden"><div class="h-full rounded-full bg-ink-300" style="width:3%"></div></div>
+                      <span class="text-[.72rem] mono text-ink-400 w-9 text-right">3%</span>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Live agent calls (DARK CARD — paid.ai event stream) -->
+          <div class="card-dark p-5 flex flex-col relative overflow-hidden">
+            <div class="flex items-center justify-between">
+              <div class="eyebrow !text-lime-500">Live event stream</div>
+              <div class="flex items-center gap-1.5 text-[.72rem] text-ink-300">
+                <span class="dot pulse" style="background:#b5e861"></span>
+                <span class="mono font-bold text-lime-500">18ms</span>
+              </div>
+            </div>
+
+            <ul class="mt-4 space-y-1.5 flex-1 text-[.82rem]">
+              <li class="flex items-center justify-between py-1.5 border-b border-forest-700 feed-in">
+                <div>
+                  <span class="mono text-white text-[.8rem]">writer · generate_doc</span>
+                  <div class="text-[.66rem] mono text-ink-400 mt-0.5">cust_acme</div>
+                </div>
+                <div class="text-right">
+                  <span class="text-coral-400 font-extrabold tnum text-[.9rem]">−25</span>
+                  <div class="text-[.66rem] mono text-ink-400">now</div>
+                </div>
+              </li>
+              <li class="flex items-center justify-between py-1.5 border-b border-forest-700">
+                <div>
+                  <span class="mono text-white text-[.8rem]">scheduler · queue_task</span>
+                  <div class="text-[.66rem] mono text-ink-400 mt-0.5">cust_flux</div>
+                </div>
+                <div class="text-right">
+                  <span class="text-coral-400 font-extrabold tnum text-[.9rem]">−12</span>
+                  <div class="text-[.66rem] mono text-ink-400">3s</div>
+                </div>
+              </li>
+              <li class="flex items-center justify-between py-1.5 border-b border-forest-700">
+                <div>
+                  <span class="mono text-white text-[.8rem]">analyzer · score_page</span>
+                  <div class="text-[.66rem] mono text-ink-400 mt-0.5">cust_vex</div>
+                </div>
+                <div class="text-right">
+                  <span class="text-coral-400 font-extrabold tnum text-[.9rem]">−30</span>
+                  <div class="text-[.66rem] mono text-ink-400">11s</div>
+                </div>
+              </li>
+              <li class="flex items-center justify-between py-1.5 border-b border-forest-700">
+                <div>
+                  <span class="mono text-white text-[.8rem]">writer · generate_doc</span>
+                  <div class="text-[.66rem] mono text-ink-400 mt-0.5">cust_acme</div>
+                </div>
+                <div class="text-right">
+                  <span class="text-coral-400 font-extrabold tnum text-[.9rem]">−25</span>
+                  <div class="text-[.66rem] mono text-ink-400">22s</div>
+                </div>
+              </li>
+              <li class="flex items-center justify-between py-1.5 border-b border-forest-700">
+                <div>
+                  <span class="mono text-white text-[.8rem]">classifier · tag_intent</span>
+                  <div class="text-[.66rem] mono text-ink-400 mt-0.5">cust_noor</div>
+                </div>
+                <div class="text-right">
+                  <span class="text-coral-400 font-extrabold tnum text-[.9rem]">−8</span>
+                  <div class="text-[.66rem] mono text-ink-400">38s</div>
+                </div>
+              </li>
+              <li class="flex items-center justify-between py-1.5 border-b border-forest-700 opacity-70">
+                <div>
+                  <span class="mono text-white text-[.8rem]">writer · generate_doc</span>
+                  <div class="text-[.66rem] mono text-ink-400 mt-0.5">cust_flux</div>
+                </div>
+                <div class="text-right">
+                  <span class="text-coral-400 font-extrabold tnum text-[.9rem]">−25</span>
+                  <div class="text-[.66rem] mono text-ink-400">52s</div>
+                </div>
+              </li>
+              <li class="flex items-center justify-between py-1.5 opacity-45">
+                <div>
+                  <span class="mono text-white text-[.8rem]">scheduler · queue_task</span>
+                  <div class="text-[.66rem] mono text-ink-400 mt-0.5">cust_vex</div>
+                </div>
+                <div class="text-right">
+                  <span class="text-coral-400 font-extrabold tnum text-[.9rem]">−12</span>
+                  <div class="text-[.66rem] mono text-ink-400">1m</div>
+                </div>
+              </li>
+            </ul>
+
+            <a class="mt-4 pt-3 border-t border-forest-700 text-center text-[.78rem] font-bold text-lime-500 hover:text-lime-300" href="#">Open live logs →</a>
+          </div>
+        </section>
+
+        <!-- ═════ ROW 4: Recent customers + Funnel ═════ -->
+        <section class="grid lg:grid-cols-5 gap-3">
+
+          <div class="card p-5 lg:col-span-3">
+            <div class="flex items-center justify-between mb-4">
+              <div>
+                <div class="eyebrow">Recent customers</div>
+                <p class="text-[.78rem] text-ink-500 mt-0.5">New workspaces this week.</p>
+              </div>
+              <a class="text-[.74rem] font-extrabold text-forest hover:text-lime-600" href="#">All 47 →</a>
+            </div>
+            <table class="w-full text-[.85rem]">
+              <thead class="text-[.6rem] uppercase tracking-[.12em] font-extrabold text-ink-400 border-b border-ink-200">
+                <tr><th class="text-left py-2">Customer</th><th class="text-left py-2">Plan</th><th class="text-right py-2">Balance</th><th class="text-right py-2">7d burn</th><th class="text-right py-2">Joined</th></tr>
+              </thead>
+              <tbody>
+                <tr class="border-b border-ink-100"><td class="py-2.5"><div class="flex items-center gap-2"><span class="w-6 h-6 rounded-md bg-lime-300 text-forest flex items-center justify-center text-[.66rem] font-extrabold">AC</span><div><div class="font-extrabold text-ink-950">Acme Corp</div><div class="text-[.66rem] mono text-ink-500">cust_acme</div></div></div></td><td class="py-2.5"><span class="chip chip-paper">Growth</span></td><td class="text-right tnum font-bold">2,184</td><td class="text-right tnum text-ink-600">632</td><td class="text-right text-ink-500 text-[.74rem]">3d ago</td></tr>
+                <tr class="border-b border-ink-100"><td class="py-2.5"><div class="flex items-center gap-2"><span class="w-6 h-6 rounded-md bg-lime-300 text-forest flex items-center justify-center text-[.66rem] font-extrabold">FL</span><div><div class="font-extrabold text-ink-950">Flux Studios</div><div class="text-[.66rem] mono text-ink-500">cust_flux</div></div></div></td><td class="py-2.5"><span class="chip chip-paper">Starter</span></td><td class="text-right tnum font-bold">312</td><td class="text-right tnum text-ink-600">88</td><td class="text-right text-ink-500 text-[.74rem]">4d ago</td></tr>
+                <tr class="border-b border-ink-100"><td class="py-2.5"><div class="flex items-center gap-2"><span class="w-6 h-6 rounded-md bg-coral-500/20 text-coral-600 flex items-center justify-center text-[.66rem] font-extrabold">VX</span><div><div class="font-extrabold text-ink-950">Vex.ai <span class="chip chip-coral !text-[.55rem] ml-1">low cr</span></div><div class="text-[.66rem] mono text-ink-500">cust_vex</div></div></div></td><td class="py-2.5"><span class="chip chip-paper">Starter</span></td><td class="text-right tnum font-extrabold text-coral-600">28</td><td class="text-right tnum text-ink-600">142</td><td class="text-right text-ink-500 text-[.74rem]">12d ago</td></tr>
+                <tr class="border-b border-ink-100"><td class="py-2.5"><div class="flex items-center gap-2"><span class="w-6 h-6 rounded-md bg-lime-300 text-forest flex items-center justify-center text-[.66rem] font-extrabold">NR</span><div><div class="font-extrabold text-ink-950">Noor Labs</div><div class="text-[.66rem] mono text-ink-500">cust_noor</div></div></div></td><td class="py-2.5"><span class="chip chip-paper">Trial</span></td><td class="text-right tnum font-bold">84</td><td class="text-right tnum text-ink-600">16</td><td class="text-right text-ink-500 text-[.74rem]">6d ago</td></tr>
+                <tr><td class="py-2.5"><div class="flex items-center gap-2"><span class="w-6 h-6 rounded-md bg-lime-300 text-forest flex items-center justify-center text-[.66rem] font-extrabold">DI</span><div><div class="font-extrabold text-ink-950">Disha <span class="chip chip-paper !text-[.55rem] ml-1">indie · IN</span></div><div class="text-[.66rem] mono text-ink-500">cust_disha</div></div></div></td><td class="py-2.5"><span class="chip chip-paper">Trial</span></td><td class="text-right tnum font-bold">100</td><td class="text-right tnum text-ink-600">0</td><td class="text-right text-ink-500 text-[.74rem]">2h ago</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Funnel (LIGHT) -->
+          <div class="card p-5 lg:col-span-2">
+            <div class="flex items-center justify-between">
+              <div>
+                <div class="eyebrow">Conversion funnel</div>
+                <p class="text-[.78rem] text-ink-500 mt-0.5">30 days · all customers</p>
+              </div>
+              <span class="chip chip-paper !text-[.58rem]">illustrative</span>
+            </div>
+            <div class="mt-4 space-y-2.5">
+              <div class="flex items-center gap-3">
+                <span class="mono text-[.72rem] w-32 shrink-0 text-ink-600">trial_started</span>
+                <div class="flex-1 h-7 rounded-md bg-ink-100 overflow-hidden">
+                  <div class="h-full rounded-md bg-lime-500 flex items-center justify-end px-2 text-forest text-[.7rem] font-extrabold" style="width:100%">152</div>
+                </div>
+              </div>
+              <div class="flex items-center gap-3">
+                <span class="mono text-[.72rem] w-32 shrink-0 text-ink-600">first_agent_used</span>
+                <div class="flex-1 h-7 rounded-md bg-ink-100 overflow-hidden">
+                  <div class="h-full rounded-md bg-lime-500 flex items-center justify-end px-2 text-forest text-[.7rem] font-extrabold" style="width:74%">113</div>
+                </div>
+              </div>
+              <div class="flex items-center gap-3">
+                <span class="mono text-[.72rem] w-32 shrink-0 text-ink-600">checkout_started</span>
+                <div class="flex-1 h-7 rounded-md bg-ink-100 overflow-hidden">
+                  <div class="h-full rounded-md bg-lime-500 flex items-center justify-end px-2 text-forest text-[.7rem] font-extrabold" style="width:46%">70</div>
+                </div>
+              </div>
+              <div class="flex items-center gap-3">
+                <span class="mono text-[.72rem] w-32 shrink-0 text-ink-600">payment_completed</span>
+                <div class="flex-1 h-7 rounded-md bg-ink-100 overflow-hidden">
+                  <div class="h-full rounded-md flex items-center justify-end px-2 text-white text-[.7rem] font-extrabold" style="width:31%;background:#f2683c">47</div>
+                </div>
+              </div>
+            </div>
+            <div class="mt-5 pt-4 border-t border-ink-200 flex items-center justify-between text-[.82rem]">
+              <span class="text-ink-500 font-medium">Trial → paid</span>
+              <span class="font-extrabold tnum text-[1.4rem] tracking-tightest">31<span class="text-ink-400 text-[.85rem]">%</span></span>
+            </div>
+          </div>
+        </section>
+
+      </div>
+    </main>
+  </div>
+</div>
+
+</body>
+</html>

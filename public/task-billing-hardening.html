@@ -1,0 +1,540 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Task · Harden AgentMint billing core + landing page honesty</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+
+<style>
+  :root{
+    --brand:#10a868; --brand-50:#e8f9f0; --brand-100:#c8f0dc; --brand-300:#5cd49d; --brand-600:#0a8a55; --brand-700:#0a6e45;
+    --ink-50:#f5faf7; --ink-100:#eef4f1; --ink-200:#e2ebe6; --ink-300:#c2d2cb; --ink-400:#93aaa0;
+    --ink-500:#618376; --ink-600:#3d6557; --ink-700:#1d4b3c; --ink-800:#10392c; --ink-900:#0a2b21; --ink-950:#06221a;
+    --coral:#f2683c; --coral-700:#a4391d; --amber:#c98a14; --amber-50:#fef5e3;
+  }
+  *,*::before,*::after{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:var(--ink-50);
+    color:var(--ink-950);
+    font-family:'Plus Jakarta Sans',ui-sans-serif,system-ui,sans-serif;
+    -webkit-font-smoothing:antialiased;
+    line-height:1.6;
+  }
+  :target{scroll-margin-top:5rem;}
+  ::selection{background:var(--brand-100); color:var(--brand-700);}
+  .mono{font-family:'JetBrains Mono',ui-monospace,monospace;}
+  .wrap{max-width:64rem; margin-inline:auto; padding-inline:1.5rem;}
+
+  /* ── Header ──────────────────────────────────────────── */
+  header.top{
+    background:#fff;
+    border-bottom:1px solid var(--ink-200);
+    position:sticky; top:0; z-index:30;
+    backdrop-filter:saturate(180%) blur(8px);
+    background:rgba(255,255,255,.92);
+  }
+  header.top .row{
+    display:flex; align-items:center; justify-content:space-between; gap:1rem;
+    padding-block:.85rem;
+  }
+  .brand{display:inline-flex; align-items:center; gap:.6rem; text-decoration:none; color:var(--ink-950); font-weight:800; font-size:1.05rem;}
+  .brand svg{display:block;}
+  .brand .mint{color:var(--brand);}
+  .top nav{display:flex; gap:1.25rem; font-size:.9rem; color:var(--ink-600);}
+  .top nav a{color:inherit; text-decoration:none;}
+  .top nav a:hover{color:var(--ink-950);}
+  .top .meta{font-size:.78rem; color:var(--ink-500); font-weight:500;}
+
+  /* ── Title block ─────────────────────────────────────── */
+  .title{
+    padding-block:3.5rem 2.5rem;
+  }
+  .eyebrow{
+    display:inline-flex; align-items:center; gap:.5rem;
+    font-size:.72rem; letter-spacing:.14em; text-transform:uppercase; font-weight:700;
+    color:var(--brand-600);
+  }
+  .eyebrow .dot{width:.45rem; height:.45rem; border-radius:999px; background:var(--brand);}
+  h1{
+    font-size:clamp(2rem,3.5vw,2.75rem); letter-spacing:-.025em; line-height:1.08;
+    font-weight:800; margin:.6rem 0 0; color:var(--ink-950);
+  }
+  .lead{
+    margin-top:1rem; max-width:46rem;
+    font-size:1.05rem; color:var(--ink-600); line-height:1.65;
+  }
+
+  /* ── Callouts / banners ──────────────────────────────── */
+  .banner{
+    background:#fff; border:1px solid var(--ink-200); border-radius:14px;
+    padding:1.1rem 1.3rem; margin-top:1.4rem;
+    display:flex; gap:1rem; align-items:flex-start;
+  }
+  .banner.warn{background:var(--amber-50); border-color:#f6d99a;}
+  .banner .ico{
+    flex-shrink:0; width:32px; height:32px; border-radius:10px;
+    display:flex; align-items:center; justify-content:center;
+    background:var(--brand-50); color:var(--brand-700); font-weight:800;
+  }
+  .banner.warn .ico{background:#f9e3b0; color:#8a5b09;}
+  .banner h3{margin:.05rem 0 .25rem; font-size:.95rem; color:var(--ink-950);}
+  .banner p{margin:0; font-size:.92rem; color:var(--ink-700);}
+
+  /* ── Stream cards ────────────────────────────────────── */
+  .stream{
+    margin-top:2.5rem;
+    background:#fff; border:1px solid var(--ink-200); border-radius:18px;
+    overflow:hidden;
+  }
+  .stream-head{
+    padding:1.4rem 1.6rem 1.25rem;
+    border-bottom:1px solid var(--ink-100);
+    background:linear-gradient(180deg, #fbfdfc 0%, #fff 100%);
+  }
+  .stream-tag{
+    display:inline-flex; align-items:center; gap:.5rem;
+    font-size:.7rem; letter-spacing:.14em; text-transform:uppercase; font-weight:700;
+    padding:.25rem .55rem; border-radius:999px;
+    background:var(--brand-50); color:var(--brand-700);
+    border:1px solid var(--brand-100);
+  }
+  .stream-head h2{
+    margin:.6rem 0 .25rem; font-size:1.5rem; letter-spacing:-.015em; line-height:1.2;
+    color:var(--ink-950);
+  }
+  .stream-head .sub{font-size:.92rem; color:var(--ink-600); margin:0;}
+  .branch{
+    margin-top:.65rem;
+    display:inline-flex; align-items:center; gap:.4rem;
+    font-family:'JetBrains Mono',ui-monospace,monospace; font-size:.82rem;
+    color:var(--ink-700);
+    background:var(--ink-100);
+    padding:.2rem .6rem; border-radius:6px;
+  }
+  .branch::before{
+    content:""; display:inline-block; width:8px; height:8px; border-radius:999px;
+    background:var(--brand); margin-right:.2rem;
+  }
+
+  /* ── Task items ──────────────────────────────────────── */
+  .tasks{padding:0; margin:0; list-style:none;}
+  .task{
+    padding:1.5rem 1.6rem;
+    border-top:1px solid var(--ink-100);
+  }
+  .task:first-child{border-top:none;}
+  .task-head{
+    display:flex; align-items:flex-start; gap:.85rem; flex-wrap:wrap;
+  }
+  .task-id{
+    flex-shrink:0;
+    font-family:'JetBrains Mono',ui-monospace,monospace; font-weight:700; font-size:.78rem;
+    background:var(--ink-950); color:#fff;
+    padding:.3rem .55rem; border-radius:7px;
+    line-height:1; letter-spacing:.04em;
+  }
+  .task-title{
+    margin:0; font-size:1.05rem; font-weight:700; color:var(--ink-950);
+    line-height:1.35; flex:1; min-width:0;
+  }
+  .prio{
+    flex-shrink:0;
+    font-family:'JetBrains Mono',ui-monospace,monospace;
+    font-size:.7rem; font-weight:700; letter-spacing:.06em;
+    padding:.18rem .5rem; border-radius:6px; text-transform:uppercase;
+  }
+  .prio.p0{background:#fce8e1; color:var(--coral-700); border:1px solid #f4b9a3;}
+  .prio.p1{background:#fdf1d0; color:#8a5b09; border:1px solid #f6d99a;}
+  .prio.note{background:var(--ink-100); color:var(--ink-600); border:1px solid var(--ink-200);}
+
+  .task-body{margin-top:.9rem; font-size:.94rem; color:var(--ink-700);}
+  .task-body p{margin:.5rem 0;}
+  .task-body ul{margin:.55rem 0; padding-left:1.25rem;}
+  .task-body li{margin:.35rem 0;}
+  .task-body code,.task-body .mono{
+    font-family:'JetBrains Mono',ui-monospace,monospace;
+    background:var(--ink-100); color:var(--ink-900);
+    padding:.05rem .35rem; border-radius:5px; font-size:.85em;
+    border:1px solid var(--ink-200);
+  }
+  .accept{
+    margin-top:1rem;
+    border-left:3px solid var(--brand); background:var(--brand-50);
+    padding:.7rem .9rem; border-radius:0 8px 8px 0;
+    font-size:.9rem; color:var(--ink-800);
+  }
+  .accept strong{color:var(--brand-700); font-weight:700;}
+
+  /* ── Output / acceptance bottom ──────────────────────── */
+  .output{
+    margin:2.5rem 0 4rem;
+    background:var(--ink-950); color:#fff;
+    border-radius:18px;
+    padding:1.6rem 1.8rem;
+  }
+  .output .eyebrow{color:var(--brand-300);}
+  .output .eyebrow .dot{background:var(--brand-300);}
+  .output h2{margin:.6rem 0 .8rem; font-size:1.4rem; letter-spacing:-.015em;}
+  .output p, .output li{color:#c2d2cb; font-size:.95rem; line-height:1.6;}
+  .output ul{margin:.6rem 0; padding-left:1.25rem;}
+  .output code{
+    font-family:'JetBrains Mono',ui-monospace,monospace;
+    background:rgba(255,255,255,.08); color:#fff;
+    padding:.08rem .4rem; border-radius:5px; font-size:.85em;
+  }
+
+  /* ── Constraints box ─────────────────────────────────── */
+  .constraints{
+    margin-top:1.4rem; background:#fff; border:1px dashed var(--ink-300); border-radius:14px;
+    padding:1.1rem 1.3rem;
+  }
+  .constraints h3{
+    margin:0 0 .55rem; font-size:.78rem; letter-spacing:.14em; text-transform:uppercase;
+    color:var(--ink-500); font-weight:700;
+  }
+  .constraints ul{margin:0; padding-left:1.2rem; color:var(--ink-700); font-size:.92rem;}
+  .constraints li{margin:.25rem 0;}
+
+  footer{
+    border-top:1px solid var(--ink-200); background:#fff;
+    padding:1.5rem 0 2.5rem;
+    color:var(--ink-500); font-size:.85rem;
+  }
+  footer .row{display:flex; justify-content:space-between; gap:1rem; flex-wrap:wrap;}
+  footer a{color:var(--brand-700); text-decoration:none;}
+  footer a:hover{text-decoration:underline;}
+
+  @media (max-width:640px){
+    .stream-head{padding:1.2rem 1.2rem 1rem;}
+    .task{padding:1.2rem;}
+    .task-head{gap:.6rem;}
+    .top nav{display:none;}
+  }
+</style>
+</head>
+<body>
+
+<!-- ───────────────────────── HEADER ───────────────────────── -->
+<header class="top">
+  <div class="wrap row">
+    <a class="brand" href="/" aria-label="AgentMint home">
+      <svg width="26" height="26" viewBox="0 0 28 28" fill="none" aria-hidden="true">
+        <rect x="2" y="2" width="24" height="24" rx="7" fill="#10a868" />
+        <circle cx="14" cy="14" r="6" stroke="#fff" stroke-width="1.9" fill="none" />
+        <path d="M14 10.2v7.6M11.6 12.6h4.8M11.6 15.4h4.8" stroke="#fff" stroke-width="1.6" stroke-linecap="round" />
+      </svg>
+      <span>Agent<span class="mint">Mint</span></span>
+    </a>
+    <nav aria-label="Sections">
+      <a href="#stream-a">Stream A</a>
+      <a href="#stream-b">Stream B</a>
+      <a href="#output">Output</a>
+    </nav>
+    <span class="meta">Internal task brief</span>
+  </div>
+</header>
+
+<!-- ───────────────────────── TITLE ───────────────────────── -->
+<section class="wrap title">
+  <div class="eyebrow"><span class="dot"></span> Engineering task</div>
+  <h1>Harden the billing core and make the landing page claims honest.</h1>
+  <p class="lead">
+    Two work streams, two branches. Surgical edits only - do not rewrite working code, do not restyle the landing page,
+    do not build any feature listed under "What is intentionally not built yet." Read
+    <code class="mono">docs/ARCHITECTURE.md</code> first for context.
+  </p>
+
+  <div class="banner warn">
+    <div class="ico">!</div>
+    <div>
+      <h3>Read this before you start</h3>
+      <p>
+        If any file location differs from what's described, find the real one before editing.
+        For anything ambiguous or higher-risk than described, <strong>stop and ask before applying</strong>.
+        Do <strong>not</strong> bundle the two streams into one PR.
+      </p>
+    </div>
+  </div>
+
+  <div class="constraints">
+    <h3>Constraints (apply to both streams)</h3>
+    <ul>
+      <li>Never edit <code class="mono">supabase/migrations/0001_*.sql</code> or <code class="mono">0002_*.sql</code> in place. New schema goes into new numbered migration files.</li>
+      <li>Do not change visual design, color system, layout, or animations on the landing page.</li>
+      <li>Do not implement any item from "What is intentionally not built yet" in ARCHITECTURE.md §13.</li>
+      <li>Each stream ships as its own branch and its own PR.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ───────────────────────── STREAM A ───────────────────────── -->
+<section id="stream-a" class="wrap">
+  <article class="stream">
+    <div class="stream-head">
+      <span class="stream-tag">Stream A</span>
+      <h2>Billing correctness &amp; tenant isolation</h2>
+      <p class="sub">Tighten the invariants the rest of the product rests on. No new features.</p>
+      <div class="branch">fix/billing-hardening</div>
+    </div>
+    <ol class="tasks">
+
+      <!-- A1 -->
+      <li class="task">
+        <div class="task-head">
+          <span class="task-id">A1</span>
+          <h3 class="task-title">Close the idempotency TOCTOU race</h3>
+          <span class="prio p0">P0</span>
+        </div>
+        <div class="task-body">
+          <p>
+            Today the debit route checks <em>"any DEBIT row already for this resourceId?"</em> as a <code>SELECT</code>
+            <strong>before</strong> calling <code>atomic_debit()</code>, outside the advisory lock. Two concurrent identical-resourceId
+            debits can both pass the pre-check and both charge.
+          </p>
+          <ul>
+            <li>Locate which table stores <code>resource_id</code> for DEBIT rows (likely <code>wallet_transactions</code> and/or <code>usage_events</code>).</li>
+            <li>Add a new migration <code class="mono">0003_idempotency_constraint.sql</code> (never edit 0001/0002 in place) that adds a UNIQUE constraint or partial unique index enforcing one DEBIT per <code>(workspace_id, resource_id)</code>.</li>
+            <li>Move idempotency enforcement <strong>inside</strong> the <code>atomic_debit()</code> transaction: attempt the insert, catch the unique-violation, and on conflict return the existing balance with <code>idempotent: true</code> instead of charging again.</li>
+            <li>Keep the existing pre-<code>SELECT</code> only as an optional fast path; the DB constraint must be the authoritative guard.</li>
+            <li>Confirm whether <code>resourceId</code> or <code>idempotencyKey</code> is the real idempotency key - the docs are ambiguous. Pick one, make it authoritative, and note the decision in ARCHITECTURE.md §6.</li>
+          </ul>
+          <div class="accept">
+            <strong>Acceptance:</strong> fire 20 parallel debits with the same <code class="mono">resourceId</code> → exactly one charge, 19 idempotent hits, balance debited once, never negative.
+          </div>
+        </div>
+      </li>
+
+      <!-- A2 -->
+      <li class="task">
+        <div class="task-head">
+          <span class="task-id">A2</span>
+          <h3 class="task-title">Tenant isolation is app-layer only</h3>
+          <span class="prio p0">P0</span>
+        </div>
+        <div class="task-body">
+          <p>
+            Everything runs as service-role and bypasses RLS, so isolation rests entirely on the
+            <code>workspace.tenant_id == key.tenantId</code> check in route code. One missing check = cross-tenant
+            money/data leak, and there's no test catching it.
+          </p>
+          <ul>
+            <li><strong>First</strong>, add an automated regression test proving isolation: a key from tenant A must get 403 on authorize, debit, and read against a tenant-B workspace. Do this regardless of the rest - it's the highest-leverage, lowest-risk step.</li>
+            <li><strong>Then propose (DO NOT implement yet)</strong> a DB-level defense-in-depth option:
+              <ul>
+                <li>An assertion inside the <code>atomic_debit</code>/authorize RPC that the caller-supplied <code>tenant_id</code> matches the workspace's <code>tenant_id</code>, OR</li>
+                <li>Real RLS policies keyed off a per-request <code class="mono">set_config('request.tenant_id', …)</code> GUC.</li>
+              </ul>
+            </li>
+            <li>Show me the trade-offs (perf, complexity, migration risk) and wait for my pick before changing the schema or auth path.</li>
+          </ul>
+        </div>
+      </li>
+
+      <!-- A3 -->
+      <li class="task">
+        <div class="task-head">
+          <span class="task-id">A3</span>
+          <h3 class="task-title">Document two known design gaps</h3>
+          <span class="prio note">Docs</span>
+        </div>
+        <div class="task-body">
+          <p>Add a short <em>"Known billing gaps"</em> subsection to <code>docs/ARCHITECTURE.md</code>. Don't fix - just document:</p>
+          <ul>
+            <li>
+              <strong>"Ran but couldn't bill" race:</strong> authorize passes → agent runs → a concurrent debit drains the balance → this debit 402s after the work is already done = unbilled work.
+              Idempotency doesn't cover this. Note a reservation/hold pattern as the future fix.
+            </li>
+            <li>
+              <strong>authorize() is on the hot path:</strong> a synchronous remote hop on every action.
+              Note client-side entitlement caching as a future optimization.
+            </li>
+          </ul>
+        </div>
+      </li>
+
+      <!-- A4 -->
+      <li class="task">
+        <div class="task-head">
+          <span class="task-id">A4</span>
+          <h3 class="task-title">Session cookie flags</h3>
+          <span class="prio p1">P1</span>
+        </div>
+        <div class="task-body">
+          <p>
+            Verify both session cookies (<code class="mono">agentmint_session</code>, <code class="mono">agentmint_builder_session</code>) set
+            <code>HttpOnly</code>, <code>Secure</code> in production, and <code>SameSite</code>. Add if missing.
+            Confirm there's a session expiry. Don't change the HMAC scheme.
+          </p>
+        </div>
+      </li>
+    </ol>
+  </article>
+</section>
+
+<!-- ───────────────────────── STREAM B ───────────────────────── -->
+<section id="stream-b" class="wrap">
+  <article class="stream">
+    <div class="stream-head">
+      <span class="stream-tag">Stream B</span>
+      <h2>Landing page honesty</h2>
+      <p class="sub">
+        Edit <code class="mono">public/landing.html</code> + the <code class="mono">design/landing.html</code> mirror + the React
+        <code class="mono">app/page.tsx</code> if it duplicates this copy.
+        Touch copy/claims and stats only - do <strong>not</strong> change the visual design, color system, layout, or animations.
+      </p>
+      <div class="branch">fix/landing-claims</div>
+    </div>
+    <ol class="tasks">
+
+      <!-- B1 -->
+      <li class="task">
+        <div class="task-head">
+          <span class="task-id">B1</span>
+          <h3 class="task-title">Stats band is fabricated</h3>
+          <span class="prio p0">P0</span>
+        </div>
+        <div class="task-body">
+          <p>
+            The hard numbers in the stats band are fabricated for a pre-pilot product:
+            <em>1,248,903 credits authorized · 47ms p99 · 6 live agents in production · 99.99% atomic debit accuracy</em>.
+            Either:
+          </p>
+          <ul>
+            <li>Delete the stats band, or</li>
+            <li>Replace with honest framing (capability statements, or numbers explicitly labelled "illustrative").</li>
+          </ul>
+          <p>Do not present invented metrics as real. Same goes for the <em>"31% trial → paid"</em> funnel - mark it illustrative or remove.</p>
+        </div>
+      </li>
+
+      <!-- B2 -->
+      <li class="task">
+        <div class="task-head">
+          <span class="task-id">B2</span>
+          <h3 class="task-title">"99.99% atomic debit accuracy" is a category error</h3>
+          <span class="prio p1">P1</span>
+        </div>
+        <div class="task-body">
+          <p>
+            Atomicity isn't a percentage - it's a correctness property. Reframe as the actual guarantee:
+            balance never goes negative, idempotent by resource_id, append-only ledger.
+          </p>
+        </div>
+      </li>
+
+      <!-- B3 -->
+      <li class="task">
+        <div class="task-head">
+          <span class="task-id">B3</span>
+          <h3 class="task-title">Reconcile claims with what's actually built</h3>
+          <span class="prio p0">P0</span>
+        </div>
+        <div class="task-body">
+          <p>
+            Anything that depends on stubbed/unbuilt features must either be marked as roadmap or softened to what's real today:
+          </p>
+          <ul>
+            <li>"Money landing in your bank" / Stripe Connect → roadmap.</li>
+            <li>"Real-time MRR &amp; NRR" → roadmap (revenue page only shows recent calls right now).</li>
+            <li>"Branded for your product, hosted by us" → roadmap (no per-tenant branding yet).</li>
+          </ul>
+          <p>Keep the existing <em>"Team seats (Phase 2)"</em>-style honest labeling pattern.</p>
+        </div>
+      </li>
+
+      <!-- B4 -->
+      <li class="task">
+        <div class="task-head">
+          <span class="task-id">B4</span>
+          <h3 class="task-title">Reframe the "30 minutes" promise</h3>
+          <span class="prio p1">P1</span>
+        </div>
+        <div class="task-body">
+          <p>
+            "30 minutes" should describe <strong>instrumenting billing</strong>, not money-in-your-bank.
+            Stripe Connect onboarding isn't 30 minutes and is stubbed. Keep the line punchy, but accurate to what 30 minutes actually buys.
+          </p>
+        </div>
+      </li>
+
+      <!-- B5 -->
+      <li class="task">
+        <div class="task-head">
+          <span class="task-id">B5</span>
+          <h3 class="task-title">Surface AgentMint's own pricing higher than the FAQ</h3>
+          <span class="prio p1">P1</span>
+        </div>
+        <div class="task-body">
+          <p>
+            A self-serve dev audience wants to know what they'll pay <em>before</em> scrolling to FAQ.
+            Keep the framing: first cohort = $0, then a platform fee + a capped percentage of payment volume.
+          </p>
+        </div>
+      </li>
+
+      <!-- B6 -->
+      <li class="task">
+        <div class="task-head">
+          <span class="task-id">B6</span>
+          <h3 class="task-title">Fix the "SDK" naming</h3>
+          <span class="prio p1">P1</span>
+        </div>
+        <div class="task-body">
+          <p>
+            There is no SDK package. It's two HTTP calls. Either say <strong>"two HTTP calls"</strong> consistently,
+            or clearly note the SDK is a thin wrapper that's coming.
+          </p>
+        </div>
+      </li>
+
+      <!-- B7 -->
+      <li class="task">
+        <div class="task-head">
+          <span class="task-id">B7</span>
+          <h3 class="task-title">402 example mixes two distinct rejection shapes</h3>
+          <span class="prio p1">P1</span>
+        </div>
+        <div class="task-body">
+          <p>
+            The on-page 402 example uses <code class="mono">reason: "insufficient_credits"</code> but includes
+            <code class="mono">requiredPlan</code> and <code class="mono">shortfall</code> - that muddles the two distinct rejection
+            shapes (<code class="mono">INSUFFICIENT_CREDITS</code> vs <code class="mono">PLAN_INSUFFICIENT</code>) from
+            ARCHITECTURE.md §11.5. Make the example match exactly one of the real shapes.
+          </p>
+        </div>
+      </li>
+    </ol>
+  </article>
+</section>
+
+<!-- ───────────────────────── OUTPUT ───────────────────────── -->
+<section id="output" class="wrap">
+  <div class="output">
+    <div class="eyebrow"><span class="dot"></span> Output expected</div>
+    <h2>For each stream, deliver:</h2>
+    <ul>
+      <li>A branch (<code>fix/billing-hardening</code> or <code>fix/landing-claims</code>).</li>
+      <li>A tight summary of what changed and why.</li>
+      <li>The new migration SQL shown <strong>in full</strong> before you apply it (Stream A only).</li>
+      <li>The isolation and idempotency tests with their results, copy-pasteable from your terminal.</li>
+    </ul>
+    <p style="margin-top:1rem;"><strong>Do not bundle the two streams into one PR.</strong></p>
+  </div>
+</section>
+
+<!-- ───────────────────────── FOOTER ───────────────────────── -->
+<footer>
+  <div class="wrap row">
+    <span>AgentMint · internal engineering brief</span>
+    <span>See <a href="/docs/ARCHITECTURE.md">docs/ARCHITECTURE.md</a> for context. Stop and ask before applying anything ambiguous.</span>
+  </div>
+</footer>
+
+</body>
+</html>
