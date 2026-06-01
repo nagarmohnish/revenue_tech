@@ -153,6 +153,30 @@ export async function POST(req: Request) {
 
 Add a registry row to `tool_registry` (see `supabase/migrations/0001_init.sql` for the seed pattern).
 
+## Bundled tools
+
+### StackScore — pricing-page analyzer (`/stackscore`)
+
+A free tool, deployed alongside AgentMint, that scores any subscription/payment page across four dimensions (Clarity, Conversion, Flexibility, Trust) and benchmarks it against ten leading SaaS pricing pages (Stripe, Notion, Figma, Linear, Vercel, Shopify, Slack, Spotify, Netflix, ChatGPT).
+
+| Concern | Where |
+|---|---|
+| Landing + input (URL or screenshot) | `app/stackscore/page.tsx` |
+| Shareable report | `app/stackscore/r/[id]/page.tsx` |
+| Analyze API (`POST {url}` or `POST {screenshot, mediaType}`) | `app/api/stackscore/analyze/route.ts` |
+| HTML signal extractor (Cheerio) | `lib/stackscore/extract.ts` |
+| Screenshot signal extractor (Claude vision) | `lib/stackscore/visionExtract.ts` |
+| Scoring engine (deterministic, 20 rules / 4 dimensions) | `lib/stackscore/scorer.ts` |
+| Benchmark dataset | `lib/stackscore/benchmarks.ts` |
+| Claude-augmented suggestions (additive) | `lib/stackscore/suggestions.ts` |
+| Supabase store | `lib/stackscore/store.ts`, migration `supabase/migrations/0003_stackscore.sql` |
+
+Open-source stack: Cheerio + Next.js + Supabase + Tailwind. The Claude API is *only* used for two things, both gracefully degraded if `ANTHROPIC_API_KEY` is absent — screenshot signal extraction (mode disabled) and 1–3 contextual suggestions per analysis (skipped silently).
+
+URL-mode runs end-to-end with no API keys beyond Supabase.
+
+> Before first use, apply `supabase/migrations/0003_stackscore.sql` in the Supabase SQL editor.
+
 ## Documents
 
 - **`docs/STRATEGY.md`** - actionable positioning, wedges, anti-positioning, prioritized roadmap. Read this first.

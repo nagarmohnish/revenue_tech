@@ -141,10 +141,11 @@ const SOLUTIONS_MENU = {
 };
 
 const RESOURCES_MENU = [
-  { title: 'Documentation', desc: 'authorize() · debit() · webhooks' },
-  { title: 'Pricing',       desc: '3 plans, $0 for the pilot cohort' },
-  { title: 'GitHub',        desc: 'github.com/nagarmohnish/revenue_tech' },
-  { title: 'Strategy memo', desc: 'Why one wallet beats per-agent billing' },
+  { title: 'StackScore (free tool)', desc: 'Score any pricing page in ~10s', href: '/stackscore' },
+  { title: 'Documentation',          desc: 'authorize() · debit() · webhooks' },
+  { title: 'Pricing',                desc: '3 plans, $0 for the pilot cohort' },
+  { title: 'GitHub',                 desc: 'github.com/nagarmohnish/revenue_tech' },
+  { title: 'Strategy memo',          desc: 'Why one wallet beats per-agent billing' },
 ];
 
 const CHECK = (
@@ -445,7 +446,7 @@ export default function LandingPage() {
               {openMenu === 'resources' && (
                 <div className="grid md:grid-cols-2 gap-x-10 gap-y-8 max-w-3xl">
                   {RESOURCES_MENU.map((m) => (
-                    <Link href="#" key={m.title} className="block group">
+                    <Link href={(m as any).href || '#'} key={m.title} className="block group">
                       <div className="font-bold text-ink-950 text-[.95rem] group-hover:text-brand-600 transition">{m.title}</div>
                       <div className="text-[.82rem] text-ink-500 mt-0.5">{m.desc}</div>
                     </Link>
