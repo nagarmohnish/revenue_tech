@@ -1,45 +1,76 @@
-export type DimensionKey = 'clarity' | 'conversion' | 'flexibility' | 'trust';
-export type InputKind = 'url' | 'screenshot';
+// StackScore now analyzes the *entire* payment funnel — landing → CTA → pricing
+// → checkout — not a single page. These types mirror the worker's WalkResponse
+// and add the scoring/aggregation that lives on the Next.js side.
 
-export interface Signals {
-  // pricing structure
-  currencySymbols: string[];
-  pricePoints: number[];
-  planCount: number;
+export type StepClass =
+  | 'landing'
+  | 'pricing'
+  | 'plan_detail'
+  | 'signup'
+  | 'checkout'
+  | 'payment'
+  | 'success'
+  | 'auth_wall'
+  | 'error'
+  | 'unknown';
 
-  // tier markers
-  hasFree: boolean;
-  hasTrial: boolean;
-  hasFreemium: boolean;
-  hasEnterprise: boolean;
+export type TerminalReason =
+  | 'completed'
+  | 'auth_wall'
+  | 'payment_reached'
+  | 'external_redirect'
+  | 'success_page'
+  | 'max_steps'
+  | 'loop'
+  | 'no_progress'
+  | 'navigation_error';
 
-  // toggles
-  hasAnnualMonthlyToggle: boolean;
-  hasAnnualDiscount: boolean;
+export type DimensionKey = 'brevity' | 'clarity' | 'transparency' | 'trust';
 
-  // CTAs
+export interface StepSignals {
   ctaCount: number;
   primaryCtaText: string | null;
-  hasHighlightedPlan: boolean;
+  competingCtaTexts: string[];
 
-  // social proof
-  hasTestimonials: boolean;
-  hasLogos: boolean;
+  formFieldCount: number;
+  requiredFieldCount: number;
+  hasCardField: boolean;
+  hasEmailField: boolean;
+  hasPasswordField: boolean;
+  hasContinueAsGuest: boolean;
 
-  // trust
+  currencySymbols: string[];
+  pricePoints: number[];
+
   paymentMethods: string[];
   hasSecurityBadges: boolean;
   hasGuarantee: boolean;
 
-  // content
   hasFAQ: boolean;
-  hasCancellationMessaging: boolean;
+  viewportHeight: number;
+  loadTimeMs: number;
 
-  // meta
+  hasStripeIframe: boolean;
+  hasOtherPaymentIframe: boolean;
+}
+
+export interface FlowStep {
+  index: number;
+  url: string;
   title: string;
-  url: string | null;
-  hostname: string | null;
-  htmlSize: number;
+  screenshotBase64: string;
+  classification: StepClass;
+  signals: StepSignals;
+  clickedCtaText: string | null;
+  terminalReason: TerminalReason | null;
+}
+
+export interface WalkResponse {
+  startUrl: string;
+  hostname: string;
+  steps: FlowStep[];
+  terminatedReason: TerminalReason;
+  durationMs: number;
 }
 
 export interface DimensionResult {
@@ -47,10 +78,19 @@ export interface DimensionResult {
   label: string;
   points: number;
   max: number;
-  hits: Array<{ rule: string; pass: boolean; weight: number; detail?: string }>;
+  detail: string;
+}
+
+export interface StepFinding {
+  stepIndex: number;
+  severity: 'good' | 'warn' | 'bad';
+  title: string;
+  body: string;
 }
 
 export interface Suggestion {
+  scope: 'flow' | 'step';
+  stepIndex?: number;
   dimension: DimensionKey;
   title: string;
   body: string;
@@ -58,30 +98,25 @@ export interface Suggestion {
   source: 'rule' | 'ai';
 }
 
-export interface Benchmark {
+export interface BenchmarkFlow {
   name: string;
-  url: string;
+  steps: number;
   score: number;
-  dimensions: Record<DimensionKey, number>;
+  signature: string;
   highlight: string;
 }
 
-export interface RankInfo {
-  position: number;
-  total: number;
-  closestTo: string;
-  median: number;
-}
-
-export interface Scorecard {
-  url: string | null;
-  hostname: string | null;
-  inputKind: InputKind;
+export interface FlowReport {
+  startUrl: string;
+  hostname: string;
   score: number;
   dimensions: DimensionResult[];
+  findings: StepFinding[];
   suggestions: Suggestion[];
-  signals: Signals;
-  benchmarks: Benchmark[];
-  rank: RankInfo;
+  steps: FlowStep[];
+  terminatedReason: TerminalReason;
+  benchmarks: BenchmarkFlow[];
+  rank: { position: number; total: number; closestTo: string };
   generatedAt: string;
+  durationMs: number;
 }

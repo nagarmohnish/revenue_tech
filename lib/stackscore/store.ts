@@ -1,7 +1,7 @@
 import { supabaseAdmin, supabaseConfigured } from '../supabase';
-import { Scorecard } from './types';
+import type { FlowReport } from './types';
 
-export async function saveReport(card: Scorecard): Promise<{ id: string }> {
+export async function saveReport(report: FlowReport): Promise<{ id: string }> {
   if (!supabaseConfigured()) {
     throw new Error('Supabase not configured. Set NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY.');
   }
@@ -9,11 +9,11 @@ export async function saveReport(card: Scorecard): Promise<{ id: string }> {
   const { data, error } = await sb
     .from('stackscore_reports')
     .insert({
-      url: card.url,
-      hostname: card.hostname,
-      input_kind: card.inputKind,
-      score: card.score,
-      payload: card,
+      url: report.startUrl,
+      hostname: report.hostname,
+      input_kind: 'url',
+      score: report.score,
+      payload: report,
     })
     .select('id')
     .single();
@@ -21,7 +21,7 @@ export async function saveReport(card: Scorecard): Promise<{ id: string }> {
   return { id: data.id };
 }
 
-export async function loadReport(id: string): Promise<Scorecard | null> {
+export async function loadReport(id: string): Promise<FlowReport | null> {
   if (!supabaseConfigured()) return null;
   if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id)) return null;
   const sb = supabaseAdmin();
@@ -31,5 +31,5 @@ export async function loadReport(id: string): Promise<Scorecard | null> {
     .eq('id', id)
     .single();
   if (error || !data) return null;
-  return data.payload as Scorecard;
+  return data.payload as FlowReport;
 }

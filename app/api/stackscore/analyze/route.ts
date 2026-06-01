@@ -1,57 +1,56 @@
 // POST /api/stackscore/analyze
 //
-// Body — one of:
-//   { "url": "https://example.com/pricing" }
-//   { "screenshot": "<base64>", "mediaType": "image/png" | "image/jpeg" | "image/webp" }
+// Body: { url: string, maxSteps?: number }
+// Response: { id, score, hostname, steps }
 //
-// Response:
-//   { id: string, score: number, hostname: string | null }
-//
-// The full Scorecard is stored in Supabase under the returned id.
-// Client redirects to /stackscore/r/{id} for the report.
+// Flow: validate URL → call Fly.io worker → score the walk → save → return id.
 
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
-import { fetchAndExtract } from '@/lib/stackscore/extract';
-import { extractSignalsFromImage } from '@/lib/stackscore/visionExtract';
-import { scoreSignals } from '@/lib/stackscore/scorer';
-import { augmentWithAiSuggestions } from '@/lib/stackscore/suggestions';
+import { normalizeAndValidateUrl } from '@/lib/stackscore/url';
+import { callWorker } from '@/lib/stackscore/walker';
+import { scoreWalk } from '@/lib/stackscore/flowScorer';
+import { augmentFlowWithAi } from '@/lib/stackscore/suggestions';
 import { saveReport } from '@/lib/stackscore/store';
 
-const Body = z.union([
-  z.object({ url: z.string().min(3).max(2048) }),
-  z.object({
-    screenshot: z.string().min(64),
-    mediaType: z.enum(['image/png', 'image/jpeg', 'image/webp', 'image/gif']),
-  }),
-]);
+const Body = z.object({
+  url: z.string().min(3).max(2048),
+  maxSteps: z.number().int().min(1).max(8).optional(),
+});
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
-export const maxDuration = 30;
+export const maxDuration = 120;  // worker can take up to 90s; allow for overhead
 
 export async function POST(req: Request) {
   let parsed;
   try {
-    const json = await req.json();
-    parsed = Body.parse(json);
+    parsed = Body.parse(await req.json());
   } catch {
-    return NextResponse.json({ error: 'BAD_REQUEST', message: 'Provide either {url} or {screenshot, mediaType}.' }, { status: 400 });
+    return NextResponse.json({ error: 'BAD_REQUEST', message: 'Provide { url }.' }, { status: 400 });
   }
 
   try {
-    const { signals, inputKind } = 'url' in parsed
-      ? { signals: await fetchAndExtract(parsed.url),                            inputKind: 'url' as const }
-      : { signals: await extractSignalsFromImage(parsed.screenshot, parsed.mediaType), inputKind: 'screenshot' as const };
+    // Pre-validate before calling the worker — saves a round trip for bad URLs.
+    normalizeAndValidateUrl(parsed.url);
 
-    let card = scoreSignals(signals, inputKind);
-    const aiSuggestions = await augmentWithAiSuggestions(card);
-    if (aiSuggestions.length) card = { ...card, suggestions: [...card.suggestions, ...aiSuggestions] };
+    const walk = await callWorker(parsed.url, parsed.maxSteps ?? 6);
+    let report = scoreWalk(walk);
 
-    const { id } = await saveReport(card);
-    return NextResponse.json({ id, score: card.score, hostname: card.hostname });
+    const aiSuggestions = await augmentFlowWithAi(report);
+    if (aiSuggestions.length) report = { ...report, suggestions: [...report.suggestions, ...aiSuggestions] };
+
+    const { id } = await saveReport(report);
+    return NextResponse.json({
+      id,
+      score: report.score,
+      hostname: report.hostname,
+      stepCount: report.steps.length,
+    });
   } catch (err: any) {
-    const message = err?.message || 'Analysis failed';
-    return NextResponse.json({ error: 'ANALYZE_FAILED', message }, { status: 400 });
+    return NextResponse.json({
+      error: 'ANALYZE_FAILED',
+      message: err?.message || 'Analysis failed',
+    }, { status: 400 });
   }
 }

@@ -155,27 +155,44 @@ Add a registry row to `tool_registry` (see `supabase/migrations/0001_init.sql` f
 
 ## Bundled tools
 
-### StackScore — pricing-page analyzer (`/stackscore`)
+### StackScore — payment-funnel walker (`/stackscore`)
 
-A free tool, deployed alongside AgentMint, that scores any subscription/payment page across four dimensions (Clarity, Conversion, Flexibility, Trust) and benchmarks it against ten leading SaaS pricing pages (Stripe, Notion, Figma, Linear, Vercel, Shopify, Slack, Spotify, Netflix, ChatGPT).
+A free tool, deployed alongside AgentMint, that **walks a real headless browser through your payment funnel** — landing → CTA → pricing → checkout — and scores it across four dimensions (Brevity, Clarity, Cost transparency, Trust). It never fills forms or submits cards; it stops at the first payment form, auth wall, or external payment-provider redirect.
+
+Two pieces:
+
+**1. Next.js side** (this repo) — landing, report UI, scorer, Supabase store
 
 | Concern | Where |
 |---|---|
-| Landing + input (URL or screenshot) | `app/stackscore/page.tsx` |
-| Shareable report | `app/stackscore/r/[id]/page.tsx` |
-| Analyze API (`POST {url}` or `POST {screenshot, mediaType}`) | `app/api/stackscore/analyze/route.ts` |
-| HTML signal extractor (Cheerio) | `lib/stackscore/extract.ts` |
-| Screenshot signal extractor (Claude vision) | `lib/stackscore/visionExtract.ts` |
-| Scoring engine (deterministic, 20 rules / 4 dimensions) | `lib/stackscore/scorer.ts` |
-| Benchmark dataset | `lib/stackscore/benchmarks.ts` |
-| Claude-augmented suggestions (additive) | `lib/stackscore/suggestions.ts` |
+| Landing + URL input | `app/stackscore/page.tsx` |
+| Shareable step-by-step report | `app/stackscore/r/[id]/page.tsx` |
+| Analyze API (POST `{url, maxSteps?}`) | `app/api/stackscore/analyze/route.ts` |
+| Worker client (HTTP, signed with shared secret) | `lib/stackscore/walker.ts` |
+| Flow scorer (deterministic, 4 dimensions × 25 pts) | `lib/stackscore/flowScorer.ts` |
+| Benchmark dataset (8 reference funnels) | `lib/stackscore/benchmarks.ts` |
+| Claude-augmented suggestions (additive, optional) | `lib/stackscore/suggestions.ts` |
 | Supabase store | `lib/stackscore/store.ts`, migration `supabase/migrations/0003_stackscore.sql` |
 
-Open-source stack: Cheerio + Next.js + Supabase + Tailwind. The Claude API is *only* used for two things, both gracefully degraded if `ANTHROPIC_API_KEY` is absent — screenshot signal extraction (mode disabled) and 1–3 contextual suggestions per analysis (skipped silently).
+**2. Playwright worker** ([`worker/`](worker/)) — runs on Fly.io, called over HTTPS
 
-URL-mode runs end-to-end with no API keys beyond Supabase.
+| Concern | Where |
+|---|---|
+| Hono server | `worker/src/index.ts` |
+| Crawl orchestrator | `worker/src/walker.ts` |
+| Per-page signal extraction (runs in-browser) | `worker/src/signals.ts` |
+| CTA selection by purchase intent | `worker/src/cta.ts` |
+| Step classification | `worker/src/classify.ts` |
+| Fly.io config + Dockerfile | `worker/fly.toml`, `worker/Dockerfile` |
 
-> Before first use, apply `supabase/migrations/0003_stackscore.sql` in the Supabase SQL editor.
+Open-source stack: Playwright + Hono + Fly.io free tier + Next.js + Supabase + Tailwind. Claude is *only* used for 1–3 contextual suggestions per report; gracefully skipped if `ANTHROPIC_API_KEY` is absent.
+
+**Before first use:**
+
+1. Apply `supabase/migrations/0003_stackscore.sql` in the Supabase SQL editor.
+2. Deploy the worker — see [`worker/README.md`](worker/README.md). Once deployed, set `STACKSCORE_WORKER_URL` and `STACKSCORE_WORKER_SECRET` in `.env.local`.
+
+For local dev, run the worker with `npm run dev` in `worker/` (after `npx playwright install chromium`) and point `STACKSCORE_WORKER_URL=http://localhost:8080`.
 
 ## Documents
 
