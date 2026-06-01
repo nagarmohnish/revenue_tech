@@ -1,8 +1,8 @@
 # AgentMint
 
-**One wallet for your whole AI-agent suite.**
+**One wallet for every agent.**
 
-AgentMint is the credits + plan-gating + billing-portal layer for AI agents, built for indie devs, startups and small studios shipping more than one agent. Your customer buys credits once and spends them across every agent you ship - writer, analyzer, scheduler, whatever comes next - with per-agent revenue attribution underneath. Integration is **two plain HTTP calls** (no SDK package yet) and one row per agent in a tool registry. Settlement runs through your own Stripe account (USD via Stripe Connect, INR via Razorpay/Cashfree on the immediate roadmap) so payouts land in your bank.
+AgentMint is the credits + plan-gating + billing-portal layer for AI agents, built for indie devs, startups and small studios shipping more than one agent. Your customer buys credits once and spends them across every agent you ship - writer, analyzer, scheduler, whatever comes next - with per-agent revenue attribution underneath. Integration is one of **three SDKs** ([TypeScript](sdks/js/), [Python](sdks/python/), [Go](sdks/go/)) or two raw HTTPS POSTs, plus one row per agent in a tool registry. Settle on **five rails** — Stripe (USD, ACH, Apple Pay), PayPal (global), Razorpay (INR), and UPI autopay (India) — payouts land in your own merchant account on each rail.
 
 This is the MVP described in `docs/AgentMint_MVP_PRD.md`. It validates the bet:
 
