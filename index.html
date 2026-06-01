@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>AgentMint · Billing for AI agents</title>
-<meta name="description" content="One credit wallet. Two HTTP calls. Every agent you ship, in one place." />
+<title>AgentMint · One wallet for every agent</title>
+<meta name="description" content="Billing for AI-agent suites. Three SDKs (or two raw HTTPS calls). Five rails to settle — Stripe, PayPal, Razorpay, Apple Pay, UPI." />
 
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -70,12 +70,19 @@
   .phase-active { background:#10a868; color:#fff; border-color:#10a868; box-shadow: 0 6px 18px -6px rgba(16,168,104,.7); }
   .phase-idle   { background:#fff; color:#618376; border-color:#e2ebe6; }
 
-  /* Mega-menu */
   .megapanel { display:none; }
   .megapanel.open { display:block; }
   .nav-trigger .chev { transition: transform .2s ease; display:inline-block; }
   .nav-trigger[aria-expanded="true"] .chev { transform: rotate(180deg); }
   .nav-trigger[aria-expanded="true"] { color:#06221a; }
+
+  .sdk-tab { font-family:'JetBrains Mono',monospace; padding:.4rem .75rem; border-radius:6px; font-size:12px; color:#93aaa0; transition:.15s; }
+  .sdk-tab:hover { color:#e2ebe6; }
+  .sdk-tab.active { background:#10392c; color:#fff; }
+  .sdk-pane { display:none; }
+  .sdk-pane.active { display:block; }
+  .sdk-tok { color:#5cd49d; }
+  .sdk-cmt { color:#93aaa0; }
 
   @media (prefers-reduced-motion: reduce) {
     .reveal { opacity:1; transform:none; transition:none; }
@@ -123,7 +130,6 @@
       </div>
     </div>
 
-    <!-- mega-panels -->
     <div id="mega" class="absolute top-full left-0 right-0 bg-white border-b border-ink-100 shadow-[0_24px_48px_-24px_rgba(6,34,26,0.18)]" style="display:none">
 
       <div class="megapanel wrap py-9" data-panel="platform">
@@ -149,43 +155,61 @@
                 </span>
                 <div><div class="font-bold text-ink-950 text-[.92rem]">Atomic debit</div><div class="text-[.8rem] text-ink-500 mt-0.5">Idempotent by resource_id, never goes negative</div></div>
               </a>
-            </div>
-          </div>
-          <div>
-            <div class="text-[11px] uppercase tracking-[.14em] text-ink-400 font-bold mb-4">Money rail</div>
-            <div class="space-y-4">
               <a href="#features" class="flex gap-3 group">
                 <span class="w-9 h-9 rounded-lg bg-ink-50 text-ink-700 flex items-center justify-center group-hover:bg-brand-500/10 group-hover:text-brand-600 transition flex-shrink-0">
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 14l4-4 4 4 4-6"/></svg>
                 </span>
                 <div><div class="font-bold text-ink-950 text-[.92rem]">Per-agent revenue</div><div class="text-[.8rem] text-ink-500 mt-0.5">Attribution + burn rate, broken out per agent</div></div>
               </a>
-              <a href="#features" class="flex gap-3 group">
+              <a href="#how" class="flex gap-3 group">
+                <span class="w-9 h-9 rounded-lg bg-ink-50 text-ink-700 flex items-center justify-center group-hover:bg-brand-500/10 group-hover:text-brand-600 transition flex-shrink-0">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+                </span>
+                <div><div class="font-bold text-ink-950 text-[.92rem]">SDKs · TS · Py · Go</div><div class="text-[.8rem] text-ink-500 mt-0.5">Or two raw HTTPS calls — your choice</div></div>
+              </a>
+            </div>
+          </div>
+          <div>
+            <div class="text-[11px] uppercase tracking-[.14em] text-ink-400 font-bold mb-4">Payment rails</div>
+            <div class="space-y-4">
+              <a href="#rails" class="flex gap-3 group">
                 <span class="w-9 h-9 rounded-lg bg-ink-50 text-ink-700 flex items-center justify-center group-hover:bg-brand-500/10 group-hover:text-brand-600 transition flex-shrink-0">
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
                 </span>
-                <div><div class="font-bold text-ink-950 text-[.92rem]">Stripe Connect</div><div class="text-[.8rem] text-ink-500 mt-0.5">USD payouts straight to your bank</div></div>
+                <div><div class="font-bold text-ink-950 text-[.92rem]">Stripe Connect</div><div class="text-[.8rem] text-ink-500 mt-0.5">USD · cards · ACH · payouts to your bank</div></div>
               </a>
-              <a href="#features" class="flex gap-3 group">
+              <a href="#rails" class="flex gap-3 group">
+                <span class="w-9 h-9 rounded-lg bg-ink-50 text-ink-700 flex items-center justify-center group-hover:bg-brand-500/10 group-hover:text-brand-600 transition flex-shrink-0">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 21l1.2-7.6h3.4c2.6 0 4.6-1.3 5.1-4 .5-2.7-1.1-4.4-3.8-4.4H7.8L5 21z"/><path d="M9 13l1-6.4h3.8c2 0 3.3 1.1 2.8 3.4-.5 2.1-2 2.9-4 2.9H9z"/></svg>
+                </span>
+                <div><div class="font-bold text-ink-950 text-[.92rem]">PayPal</div><div class="text-[.8rem] text-ink-500 mt-0.5">Global checkout for non-card geographies</div></div>
+              </a>
+              <a href="#rails" class="flex gap-3 group">
                 <span class="w-9 h-9 rounded-lg bg-ink-50 text-ink-700 flex items-center justify-center group-hover:bg-brand-500/10 group-hover:text-brand-600 transition flex-shrink-0">
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10A15.3 15.3 0 0 1 8 12 15.3 15.3 0 0 1 12 2z"/></svg>
                 </span>
-                <div><div class="font-bold text-ink-950 text-[.92rem]">India settlement</div><div class="text-[.8rem] text-ink-500 mt-0.5">INR via Razorpay/Cashfree · UPI · GST (in build)</div></div>
+                <div><div class="font-bold text-ink-950 text-[.92rem]">Razorpay</div><div class="text-[.8rem] text-ink-500 mt-0.5">INR cards + netbanking for India workspaces</div></div>
+              </a>
+              <a href="#rails" class="flex gap-3 group">
+                <span class="w-9 h-9 rounded-lg bg-ink-50 text-ink-700 flex items-center justify-center group-hover:bg-brand-500/10 group-hover:text-brand-600 transition flex-shrink-0">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 17.5c-.4 1-1 2-1.8 2.8-.7.7-1.6 1-2.5.9-.8-.1-1.3-.4-2.4-.4s-1.5.3-2.4.4c-.9.1-1.8-.3-2.5-1-1.7-1.7-3-4.9-1.3-7.1.9-1.2 2.3-1.9 3.7-1.9 1 0 1.6.3 2.5.3 0 0 .8-.4 2.6-.3.7 0 2.6.3 3.4 2.1-.1.1-2.3 1.4-2.3 4 0 2.9 2.5 4 2.6 4z"/><path d="M14 5.4c.6-.7 1-1.7.9-2.6-.9.1-1.9.6-2.4 1.3-.5.6-1 1.6-.9 2.5 1 .1 1.9-.4 2.4-1.2z"/></svg>
+                </span>
+                <div><div class="font-bold text-ink-950 text-[.92rem]">Apple Pay</div><div class="text-[.8rem] text-ink-500 mt-0.5">One-tap mobile checkout via Stripe</div></div>
+              </a>
+              <a href="#rails" class="flex gap-3 group">
+                <span class="w-9 h-9 rounded-lg bg-ink-50 text-ink-700 flex items-center justify-center group-hover:bg-brand-500/10 group-hover:text-brand-600 transition flex-shrink-0">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4l-4 8 4 8M15 4l4 8-4 8M11 7l-2 5h6l-2 5"/></svg>
+                </span>
+                <div><div class="font-bold text-ink-950 text-[.92rem]">UPI · autopay</div><div class="text-[.8rem] text-ink-500 mt-0.5">Recurring debit via UPI mandate (India)</div></div>
               </a>
             </div>
           </div>
           <div class="rounded-xl p-5 bg-gradient-to-br from-brand-50 to-ink-50 border border-brand-100">
-            <div class="text-[11px] uppercase tracking-[.14em] text-brand-700 font-bold">Inside the dashboard</div>
-            <div class="mt-3 rounded-lg bg-white border border-ink-100 p-3">
-              <div class="flex items-center justify-between text-[.7rem] text-ink-500"><span>Wallet</span><span class="mono text-[.65rem]">2,184 cr</span></div>
-              <div class="mt-2 h-1.5 rounded-full bg-ink-100 overflow-hidden"><div class="h-full bg-brand-500" style="width:73%"></div></div>
-              <div class="mt-3 space-y-1.5">
-                <div class="flex justify-between text-[.7rem]"><span class="mono text-ink-700">writer</span><span class="text-coral-500 mono">−25</span></div>
-                <div class="flex justify-between text-[.7rem]"><span class="mono text-ink-700">analyzer</span><span class="text-coral-500 mono">−30</span></div>
-              </div>
-            </div>
-            <a href="#" class="mt-4 inline-flex items-center gap-1 text-[.78rem] font-bold text-ink-950 hover:text-brand-600 transition">
-              See it live
+            <div class="text-[11px] uppercase tracking-[.14em] text-brand-700 font-bold">SDKs are live</div>
+            <h4 class="mt-2 font-extrabold text-ink-950 text-[1rem] leading-tight tracking-tight">Three packages. One contract.</h4>
+            <p class="mt-2 text-[.78rem] text-ink-600 leading-snug"><span class="mono">@agentmint/sdk</span> · <span class="mono">agentmint</span> (PyPI) · <span class="mono">agentmint-go</span></p>
+            <a href="#how" class="mt-4 inline-flex items-center gap-1 text-[.78rem] font-bold text-ink-950 hover:text-brand-600 transition">
+              See snippets
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
             </a>
           </div>
@@ -227,7 +251,7 @@
           <a href="#" class="block group"><div class="font-bold text-ink-950 text-[.95rem] group-hover:text-brand-600 transition">Documentation</div><div class="text-[.82rem] text-ink-500 mt-0.5">authorize() · debit() · webhooks</div></a>
           <a href="#pricing" class="block group"><div class="font-bold text-ink-950 text-[.95rem] group-hover:text-brand-600 transition">Pricing</div><div class="text-[.82rem] text-ink-500 mt-0.5">3 plans, $0 for the pilot cohort</div></a>
           <a href="https://github.com/nagarmohnish/revenue_tech" class="block group"><div class="font-bold text-ink-950 text-[.95rem] group-hover:text-brand-600 transition">GitHub</div><div class="text-[.82rem] text-ink-500 mt-0.5">github.com/nagarmohnish/revenue_tech</div></a>
-          <a href="#" class="block group"><div class="font-bold text-ink-950 text-[.95rem] group-hover:text-brand-600 transition">Strategy memo</div><div class="text-[.82rem] text-ink-500 mt-0.5">Why one wallet beats per-agent billing</div></a>
+          <a href="https://github.com/nagarmohnish/revenue_tech/tree/main/sdks" class="block group"><div class="font-bold text-ink-950 text-[.95rem] group-hover:text-brand-600 transition">SDKs</div><div class="text-[.82rem] text-ink-500 mt-0.5">TypeScript · Python · Go (0.1.0)</div></a>
         </div>
       </div>
 
@@ -247,11 +271,11 @@
               Pilot cohort is open · $0 for first 6 builders
             </div>
             <h1 class="reveal h1 balance mt-6">
-              Billing for
-              <span id="rotor" class="text-brand-500 inline-block">AI agents.</span>
+              One wallet for
+              <span id="rotor" class="text-brand-500 inline-block">every agent.</span>
             </h1>
             <p class="reveal lead mt-6 max-w-xl">
-              One credit wallet. Two HTTP calls. Every agent you ship, in one place.
+              Billing for AI-agent suites. Three SDKs (or two raw HTTPS calls). Five rails to settle — Stripe, PayPal, Razorpay, Apple Pay, UPI.
             </p>
             <div class="reveal mt-8 flex flex-wrap gap-3">
               <a href="#" class="inline-flex items-center gap-1.5 text-[.95rem] font-semibold text-white bg-ink-950 hover:bg-ink-800 rounded-lg px-5 py-3 transition">
@@ -310,12 +334,22 @@
       </div>
     </section>
 
-    <!-- ─────────── BUILT ON STRIP ─────────── -->
-    <section class="border-y border-ink-100 bg-white">
-      <div class="wrap py-8 flex flex-col md:flex-row items-center justify-between gap-5">
-        <div class="text-[12px] uppercase tracking-[.14em] text-ink-400 font-semibold">Built on the rails you trust</div>
-        <div class="flex flex-wrap items-center gap-x-8 gap-y-3 text-[.95rem] font-bold text-ink-500">
-          <span>Supabase</span><span>Stripe</span><span>Next.js</span><span>Razorpay</span><span>Vercel</span><span>PostHog</span><span>Resend</span>
+    <!-- ─────────── PAYMENT RAILS STRIP ─────────── -->
+    <section id="rails" class="border-y border-ink-100 bg-white">
+      <div class="wrap py-9">
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-5 mb-6">
+          <div>
+            <div class="text-[12px] uppercase tracking-[.14em] text-brand-700 font-bold">Five rails to settle</div>
+            <p class="mt-1 text-[.92rem] text-ink-600">Take payment the way your customer wants to pay. We hand the money to your bank.</p>
+          </div>
+          <span class="text-[12px] mono text-ink-400">USD · INR · global</span>
+        </div>
+        <div class="grid grid-cols-2 md:grid-cols-5 gap-3">
+          <div class="border border-ink-100 rounded-xl px-4 py-3.5 hover:border-brand-200 transition bg-ink-50/40"><div class="font-extrabold text-ink-950 text-[.95rem] tracking-tight">Stripe</div><div class="text-[.74rem] text-ink-500 mono mt-0.5">USD · cards · ACH</div></div>
+          <div class="border border-ink-100 rounded-xl px-4 py-3.5 hover:border-brand-200 transition bg-ink-50/40"><div class="font-extrabold text-ink-950 text-[.95rem] tracking-tight">PayPal</div><div class="text-[.74rem] text-ink-500 mono mt-0.5">global checkout</div></div>
+          <div class="border border-ink-100 rounded-xl px-4 py-3.5 hover:border-brand-200 transition bg-ink-50/40"><div class="font-extrabold text-ink-950 text-[.95rem] tracking-tight">Razorpay</div><div class="text-[.74rem] text-ink-500 mono mt-0.5">INR · cards</div></div>
+          <div class="border border-ink-100 rounded-xl px-4 py-3.5 hover:border-brand-200 transition bg-ink-50/40"><div class="font-extrabold text-ink-950 text-[.95rem] tracking-tight">Apple Pay</div><div class="text-[.74rem] text-ink-500 mono mt-0.5">one-tap mobile</div></div>
+          <div class="border border-ink-100 rounded-xl px-4 py-3.5 hover:border-brand-200 transition bg-ink-50/40"><div class="font-extrabold text-ink-950 text-[.95rem] tracking-tight">UPI</div><div class="text-[.74rem] text-ink-500 mono mt-0.5">autopay · India</div></div>
         </div>
       </div>
     </section>
@@ -335,8 +369,8 @@
           </div>
           <div class="reveal card p-7">
             <div class="w-10 h-10 rounded-xl bg-brand-500/10 flex items-center justify-center"><span class="w-2 h-2 rounded-full bg-brand-500"></span></div>
-            <h3 class="mt-5 font-extrabold text-ink-950 text-[1.1rem] tracking-tight">Two HTTP calls</h3>
-            <p class="mt-2 text-[14.5px] text-ink-600 leading-relaxed">authorize() before, debit() after. No SDK. Any stack that speaks HTTPS.</p>
+            <h3 class="mt-5 font-extrabold text-ink-950 text-[1.1rem] tracking-tight">Three SDKs · or two raw HTTPS calls</h3>
+            <p class="mt-2 text-[14.5px] text-ink-600 leading-relaxed">TypeScript, Python, Go. authorize() before, debit() after. Raw HTTP works just as well.</p>
           </div>
           <div class="reveal card p-7">
             <div class="w-10 h-10 rounded-xl bg-brand-500/10 flex items-center justify-center"><span class="w-2 h-2 rounded-full bg-brand-500"></span></div>
@@ -359,7 +393,7 @@
           <div class="reveal rounded-2xl p-8 bg-brand-50/60 border border-brand-100">
             <div class="text-[3rem] leading-none font-extrabold tracking-tight text-ink-950 tnum">~30 min</div>
             <div class="mt-2 text-[14px] font-semibold text-brand-700">to instrument an agent</div>
-            <p class="mt-4 text-[14.5px] text-ink-600 leading-relaxed">Two HTTP calls plus one registry row. No SDK to vendor.</p>
+            <p class="mt-4 text-[14.5px] text-ink-600 leading-relaxed">Two HTTPS calls plus one registry row. Pick the SDK or skip it.</p>
           </div>
           <div class="reveal rounded-2xl p-8 bg-brand-50/60 border border-brand-100">
             <div class="text-[3rem] leading-none font-extrabold tracking-tight text-ink-950 tnum">1 wallet</div>
@@ -367,9 +401,9 @@
             <p class="mt-4 text-[14.5px] text-ink-600 leading-relaxed">Per-agent attribution underneath — wallet on top.</p>
           </div>
           <div class="reveal rounded-2xl p-8 bg-brand-50/60 border border-brand-100">
-            <div class="text-[3rem] leading-none font-extrabold tracking-tight text-ink-950 tnum">$0</div>
-            <div class="mt-2 text-[14px] font-semibold text-brand-700">for the pilot cohort</div>
-            <p class="mt-4 text-[14.5px] text-ink-600 leading-relaxed">First six builders pay nothing while we harden Connect together.</p>
+            <div class="text-[3rem] leading-none font-extrabold tracking-tight text-ink-950 tnum">5 rails</div>
+            <div class="mt-2 text-[14px] font-semibold text-brand-700">to take payment</div>
+            <p class="mt-4 text-[14.5px] text-ink-600 leading-relaxed">Stripe, PayPal, Razorpay, Apple Pay, UPI. Settle to your own merchant account.</p>
           </div>
         </div>
       </div>
@@ -391,34 +425,72 @@
             </li>
             <li class="reveal card p-5 flex gap-5">
               <div class="w-11 h-11 rounded-xl bg-brand-500 text-white font-extrabold flex items-center justify-center mono text-[.95rem] flex-shrink-0">02</div>
-              <div><h3 class="font-extrabold text-ink-950 tracking-tight">Authorize</h3><p class="mt-1 text-[14px] text-ink-600 leading-relaxed">POST /v1/authorize before the agent runs. Plan + balance checked atomically.</p></div>
+              <div><h3 class="font-extrabold text-ink-950 tracking-tight">Authorize</h3><p class="mt-1 text-[14px] text-ink-600 leading-relaxed">Call <span class="mono text-ink-900">authorize()</span> before the agent runs. Plan + balance checked atomically.</p></div>
             </li>
             <li class="reveal card p-5 flex gap-5">
               <div class="w-11 h-11 rounded-xl bg-brand-500 text-white font-extrabold flex items-center justify-center mono text-[.95rem] flex-shrink-0">03</div>
-              <div><h3 class="font-extrabold text-ink-950 tracking-tight">Debit</h3><p class="mt-1 text-[14px] text-ink-600 leading-relaxed">POST /v1/debit on success. Idempotent by resource_id. Funnel events emitted.</p></div>
+              <div><h3 class="font-extrabold text-ink-950 tracking-tight">Debit</h3><p class="mt-1 text-[14px] text-ink-600 leading-relaxed">Call <span class="mono text-ink-900">debit()</span> on success. Idempotent by resource_id. Funnel events emitted.</p></div>
             </li>
           </ol>
 
           <div class="reveal rounded-2xl overflow-hidden border border-ink-200 bg-ink-950 text-ink-50">
-            <div class="flex items-center gap-1.5 px-4 py-2.5 border-b border-ink-800">
+            <div class="flex items-center gap-1 px-2 py-2 border-b border-ink-800">
+              <span class="w-2.5 h-2.5 rounded-full bg-ink-700 ml-2"></span>
               <span class="w-2.5 h-2.5 rounded-full bg-ink-700"></span>
               <span class="w-2.5 h-2.5 rounded-full bg-ink-700"></span>
-              <span class="w-2.5 h-2.5 rounded-full bg-ink-700"></span>
-              <span class="ml-3 mono text-[12px] text-ink-400">agent.ts</span>
+              <div class="ml-4 flex items-center gap-0.5">
+                <button class="sdk-tab active" data-tab="js">TypeScript</button>
+                <button class="sdk-tab"        data-tab="python">Python</button>
+                <button class="sdk-tab"        data-tab="go">Go</button>
+              </div>
             </div>
-<pre class="mono text-[12.5px] leading-[1.7] px-5 py-5 overflow-auto"><code><span class="text-ink-400">// before the agent runs</span>
-await fetch('https://api.agentmint.com/v1/<span class="text-brand-300">authorize</span>', {
-  method: 'POST',
-  headers: { Authorization: 'Bearer am_live_…' },
-  body: JSON.stringify({ workspaceId, product: 'writer', action: 'generate_doc', cost: 25 }),
-});
 
-<span class="text-ink-400">// on success</span>
-await fetch('https://api.agentmint.com/v1/<span class="text-brand-300">debit</span>', {
-  method: 'POST',
-  headers: { Authorization: 'Bearer am_live_…' },
-  body: JSON.stringify({ workspaceId, product: 'writer', action: 'generate_doc', cost: 25, resourceId }),
+            <div class="px-5 pt-3 pb-1 flex items-center gap-2 border-b border-ink-800/60">
+              <span class="text-[10.5px] uppercase tracking-[.14em] text-ink-500 font-bold">Install</span>
+              <code id="install-cmd" class="mono text-[12px] text-brand-300 bg-ink-900 px-2 py-0.5 rounded">npm install @agentmint/sdk</code>
+            </div>
+
+<pre id="pane-js" class="sdk-pane active mono text-[12.5px] leading-[1.7] px-5 py-5 overflow-auto"><code>import { AgentMint } from '@agentmint/sdk';
+
+const am = new AgentMint({ apiKey: process.env.AGENTMINT_KEY! });
+
+<span class="sdk-cmt">// before the agent runs</span>
+const decision = await am.<span class="sdk-tok">authorize</span>({
+  workspaceId, product: 'writer', action: 'generate_doc', cost: 25,
+});
+if (!decision.allow) throw new Error(decision.reason);
+
+<span class="sdk-cmt">// on success</span>
+await am.<span class="sdk-tok">debit</span>({
+  workspaceId, product: 'writer', action: 'generate_doc', cost: 25, resourceId,
 });</code></pre>
+
+<pre id="pane-python" class="sdk-pane mono text-[12.5px] leading-[1.7] px-5 py-5 overflow-auto"><code>from agentmint import AgentMint
+
+am = AgentMint(api_key="am_live_…")
+
+<span class="sdk-cmt"># before the agent runs</span>
+d = am.<span class="sdk-tok">authorize</span>(workspace_id=ws, product="writer", action="generate_doc", cost=25)
+if not d.allow: raise RuntimeError(d.reason)
+
+<span class="sdk-cmt"># on success</span>
+am.<span class="sdk-tok">debit</span>(workspace_id=ws, product="writer", action="generate_doc",
+         cost=25, resource_id=doc_id)</code></pre>
+
+<pre id="pane-go" class="sdk-pane mono text-[12.5px] leading-[1.7] px-5 py-5 overflow-auto"><code>import am "github.com/nagarmohnish/agentmint-go"
+
+c, _ := am.New("am_live_…")
+
+<span class="sdk-cmt">// before the agent runs</span>
+d, err := c.<span class="sdk-tok">Authorize</span>(ctx, am.AuthorizeArgs{
+  WorkspaceID: ws, Product: "writer", Action: "generate_doc", Cost: 25,
+})
+if !d.Allow { log.Fatal(d.Reason) }
+
+<span class="sdk-cmt">// on success</span>
+c.<span class="sdk-tok">Debit</span>(ctx, am.DebitArgs{
+  AuthorizeArgs: ..., ResourceID: docID,
+})</code></pre>
           </div>
         </div>
       </div>
@@ -449,7 +521,7 @@ await fetch('https://api.agentmint.com/v1/<span class="text-brand-300">debit</sp
             <div class="mt-3 flex items-baseline gap-1.5"><span class="text-[2.4rem] font-extrabold tracking-tight text-ink-950">$49</span><span class="text-[14px] text-ink-500">/ month</span></div>
             <ul class="mt-6 space-y-3 text-[14.5px] text-ink-700 flex-1">
               <li class="flex gap-2.5 items-start"><svg class="mt-0.5" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#10a868" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span>Up to 25 workspaces</span></li>
-              <li class="flex gap-2.5 items-start"><svg class="mt-0.5" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#10a868" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span>Stripe Connect (USD)</span></li>
+              <li class="flex gap-2.5 items-start"><svg class="mt-0.5" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#10a868" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span>Stripe + PayPal + Apple Pay (USD)</span></li>
               <li class="flex gap-2.5 items-start"><svg class="mt-0.5" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#10a868" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span>Email + Slack support</span></li>
             </ul>
             <a href="#" class="mt-7 inline-flex items-center justify-center gap-1.5 text-[14px] font-semibold rounded-lg px-4 py-2.5 transition bg-ink-950 text-white hover:bg-ink-800">Start free</a>
@@ -459,7 +531,7 @@ await fetch('https://api.agentmint.com/v1/<span class="text-brand-300">debit</sp
             <div class="mt-3 flex items-baseline gap-1.5"><span class="text-[2.4rem] font-extrabold tracking-tight text-ink-950">$199</span><span class="text-[14px] text-ink-500">/ month</span></div>
             <ul class="mt-6 space-y-3 text-[14.5px] text-ink-700 flex-1">
               <li class="flex gap-2.5 items-start"><svg class="mt-0.5" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#10a868" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span>Unlimited workspaces</span></li>
-              <li class="flex gap-2.5 items-start"><svg class="mt-0.5" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#10a868" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span>INR / UPI / GST (in build)</span></li>
+              <li class="flex gap-2.5 items-start"><svg class="mt-0.5" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#10a868" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span>Razorpay + UPI + GST (in build)</span></li>
               <li class="flex gap-2.5 items-start"><svg class="mt-0.5" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#10a868" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span>Priority pilot status</span></li>
             </ul>
             <a href="#" class="mt-7 inline-flex items-center justify-center gap-1.5 text-[14px] font-semibold rounded-lg px-4 py-2.5 transition bg-white text-ink-800 border border-ink-200 hover:border-ink-400">Start free</a>
@@ -476,8 +548,9 @@ await fetch('https://api.agentmint.com/v1/<span class="text-brand-300">debit</sp
           <h2 class="h2 balance mt-4">Quick answers.</h2>
         </div>
         <div class="mt-10 max-w-3xl divide-y divide-ink-100">
-          <div class="reveal py-6"><h3 class="font-extrabold text-ink-950 tracking-tight text-[1.02rem]">Do I need a specific stack?</h3><p class="mt-2 text-[14.5px] text-ink-600 leading-relaxed">No. Integration is two plain HTTP calls. Anything that speaks HTTPS works.</p></div>
-          <div class="reveal py-6"><h3 class="font-extrabold text-ink-950 tracking-tight text-[1.02rem]">How does payout work?</h3><p class="mt-2 text-[14.5px] text-ink-600 leading-relaxed">Through your own Stripe (USD now) or Razorpay/Cashfree (INR, next). AgentMint never holds the money.</p></div>
+          <div class="reveal py-6"><h3 class="font-extrabold text-ink-950 tracking-tight text-[1.02rem]">Do I have to use an SDK?</h3><p class="mt-2 text-[14.5px] text-ink-600 leading-relaxed">No. SDKs (TypeScript, Python, Go) are convenience wrappers — under them it is still two raw HTTPS POST calls. Pick whichever fits your stack.</p></div>
+          <div class="reveal py-6"><h3 class="font-extrabold text-ink-950 tracking-tight text-[1.02rem]">Which payment rails are live?</h3><p class="mt-2 text-[14.5px] text-ink-600 leading-relaxed">Stripe Connect (USD, ACH, Apple Pay) ships first. Razorpay + UPI autopay (INR) and PayPal land next on the priority queue.</p></div>
+          <div class="reveal py-6"><h3 class="font-extrabold text-ink-950 tracking-tight text-[1.02rem]">How does payout work?</h3><p class="mt-2 text-[14.5px] text-ink-600 leading-relaxed">Through your own merchant account on each rail. AgentMint never holds the money — payouts go straight to your bank on the rail's schedule.</p></div>
           <div class="reveal py-6"><h3 class="font-extrabold text-ink-950 tracking-tight text-[1.02rem]">Is this the same as x402?</h3><p class="mt-2 text-[14.5px] text-ink-600 leading-relaxed">No. x402 lets agents pay autonomously. AgentMint lets humans pay for the agents you ship.</p></div>
         </div>
       </div>
@@ -512,7 +585,8 @@ await fetch('https://api.agentmint.com/v1/<span class="text-brand-300">debit</sp
         <div class="flex items-center gap-6">
           <a href="#features" class="hover:text-ink-950 transition">Features</a>
           <a href="#pricing" class="hover:text-ink-950 transition">Pricing</a>
-          <a href="#" class="hover:text-ink-950 transition">Get started</a>
+          <a href="#rails" class="hover:text-ink-950 transition">Rails</a>
+          <a href="https://github.com/nagarmohnish/revenue_tech/tree/main/sdks" class="hover:text-ink-950 transition">SDKs</a>
         </div>
       </div>
     </footer>
@@ -521,7 +595,6 @@ await fetch('https://api.agentmint.com/v1/<span class="text-brand-300">debit</sp
 
 <script>
 (function() {
-  // ─── Mega-menu open/close ───
   var hdr = document.getElementById('hdr');
   var mega = document.getElementById('mega');
   var triggers = document.querySelectorAll('.nav-trigger');
@@ -550,9 +623,20 @@ await fetch('https://api.agentmint.com/v1/<span class="text-brand-300">debit</sp
 
   var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  // ─── Rotor ───
+  // SDK tabs
+  var INSTALL = { js: 'npm install @agentmint/sdk', python: 'pip install agentmint', go: 'go get github.com/nagarmohnish/agentmint-go' };
+  document.querySelectorAll('.sdk-tab').forEach(function (tab) {
+    tab.addEventListener('click', function () {
+      var id = tab.getAttribute('data-tab');
+      document.querySelectorAll('.sdk-tab').forEach(function (t) { t.classList.toggle('active', t === tab); });
+      document.querySelectorAll('.sdk-pane').forEach(function (p) { p.classList.toggle('active', p.id === 'pane-' + id); });
+      document.getElementById('install-cmd').textContent = INSTALL[id];
+    });
+  });
+
+  // Rotor
   var rotor = document.getElementById('rotor');
-  var words = ['AI agents.', 'writer agents.', 'RAG agents.', 'voice agents.', 'every agent.'];
+  var words = ['every agent.', 'your writer.', 'your RAG bot.', 'your voice agent.', 'your whole suite.'];
   if (rotor && !reduce) {
     var i = 0;
     setInterval(function () {
@@ -568,7 +652,7 @@ await fetch('https://api.agentmint.com/v1/<span class="text-brand-300">debit</sp
     }, 2200);
   }
 
-  // ─── Pipeline phase cycle ───
+  // Pipeline phase cycle
   if (!reduce) {
     var phases = ['authorize', 'run', 'debit'];
     var step = 0;
@@ -583,7 +667,7 @@ await fetch('https://api.agentmint.com/v1/<span class="text-brand-300">debit</sp
     }, 1400);
   }
 
-  // ─── Live wallet ───
+  // Live wallet
   var samples = [
     { name: 'writer · generate_doc',   cost: 25 },
     { name: 'analyzer · score_page',   cost: 30 },
@@ -614,7 +698,7 @@ await fetch('https://api.agentmint.com/v1/<span class="text-brand-300">debit</sp
     }, 4200);
   }
 
-  // ─── Reveal on scroll ───
+  // Reveal on scroll
   var rev = document.querySelectorAll('.reveal');
   if (reduce) {
     rev.forEach(function (el) { el.classList.add('in'); });
