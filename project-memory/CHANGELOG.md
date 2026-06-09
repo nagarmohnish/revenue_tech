@@ -9,6 +9,28 @@ Reverse-chronological log of meaningful changes. Each entry:
 
 ---
 
+## 2026-06-10 · Brand pivot — concept-9 dark + safety orange
+
+User shipped a Claude Design handoff bundle (`concept-9.html.dc.html`) and asked us to use it as the primary design across all screens. Complete visual reset:
+
+**Color** — Background `#101014` (near-black), accent `#FF7A1A` (safety orange), body text `#F2F2F0`. The old brand-green is fully replaced; `brand` tokens are aliased to safety orange so older screens continue rendering correctly.
+
+**Type** — Display: `Archivo Black` (UPPERCASE, used for h1/h2). Body: `Archivo` (regular weight). Mono: `Martian Mono` (eyebrows, labels, code, numerics). Fonts pulled from Google Fonts.
+
+**Surfaces** — Square corners everywhere (radius forced to 0 in tailwind config except `full` for pills). Thin orange-tinted borders (`rgba(255,122,26,0.14)` to `0.55`). Surfaces are dark (`#17171C`, `#15151A`). Glow shadows replace drop shadows.
+
+**Components** — `tailwind.config.ts`, `globals.css`, and all of `components/ui/{buttons,cards,forms,layout}.tsx` rewritten. `BuilderShell`, `AppShell`, `AuthShell` rewritten for dark theme — sidebar/topbar use orange-tinted dividers, active items pulse orange.
+
+**Landing** — `app/page.tsx` rebuilt to match concept-9 pixel-for-pixel: hero with `Archivo Black` `PEOPLE BUILD. WE MONETIZE.`, 4-up stat tiles in a 1px-orange grid, billing-mode segmented control, wallet & invoice mocks, three-up Why cards, audience tabs, console mock (3 tiles with the wallet/invoice/per-agent revenue), SDK code tabs with comment-tint, three pricing cards (middle is `MOST POPULAR` ribbon), FAQ with Q-marker pattern, CTA.
+
+**WebGL** — Three.js scene ported verbatim: orange rails (Bezier-curve `TubeGeometry`) converging on a glowing junction sphere; mirrored reflection group flipped across the floor plane; atmospheric motes; `UnrealBloomPass` post-processing; shader-driven energy pulses on each rail. Loaded via Next.js `<Script>` from CDN.
+
+**Smooth scroll** — Lenis library loaded from CDN; scroll velocity drives camera glide toward the junction (`camera.position.z` interpolates from 24 → 9 as you scroll to the bottom). Respects `prefers-reduced-motion`.
+
+**gh-pages** — `concept-9.html.dc.html` + `support.js` published verbatim at https://nagarmohnish.github.io/revenue_tech/ for the static mirror (uses the Anthropic dc template engine).
+
+---
+
 ## 2026-06-10 · Design system + product-surface refresh (Phase 1)
 
 Shipped `components/ui/` — a real design system replacing the ad-hoc utility classes scattered through pages. Five themed files: `buttons.tsx`, `cards.tsx`, `forms.tsx`, `layout.tsx`, plus an `index.ts` re-export. Primitives: `Button`, `LinkButton`, `IconButton`, `Card`, `Stat`, `EmptyState`, `InfoBanner`, `Field`, `Input`, `Textarea`, `Select`, `InputGroup`, `RadioCardGrid`, `Toggle`, `Eyebrow`, `PageHeader`, `SectionHeader`, `Badge`, `Tabs`, `CodeBlock`, `Spinner`, `Kbd`.

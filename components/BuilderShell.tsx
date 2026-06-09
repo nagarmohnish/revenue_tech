@@ -6,7 +6,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import {
   Boxes, CreditCard, Gauge, KeyRound, LayoutDashboard, LogOut, PlugZap,
   Sliders, TerminalSquare, Menu, X, ChevronDown, ExternalLink, BookOpen,
-  HelpCircle, Wallet,
+  HelpCircle,
 } from 'lucide-react';
 
 const NAV = [
@@ -37,71 +37,58 @@ export function BuilderShell({ children, accountName, accountSlug }: BuilderShel
   }
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-ink-950 text-ink-50">
 
-      {/* Top bar — visible on every page */}
-      <header className="sticky top-0 z-30 bg-white/95 backdrop-blur border-b border-ink-100">
+      <header className="sticky top-0 z-30 bg-ink-950/85 backdrop-blur border-b border-saf-500/12">
         <div className="px-5 md:px-6 h-14 flex items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <button
-              className="md:hidden w-9 h-9 inline-flex items-center justify-center rounded-md text-ink-600 hover:bg-ink-50"
+              className="md:hidden w-9 h-9 inline-flex items-center justify-center text-ink-50/70 hover:bg-saf-500/8 hover:text-saf-500"
               onClick={() => setOpen((o) => !o)}
               aria-label="Toggle menu"
             >
               {open ? <X size={18} /> : <Menu size={18} />}
             </button>
-            <Link href="/build" className="flex items-center gap-2.5 font-extrabold text-ink-950">
-              <span className="relative w-7 h-7 rounded-lg bg-ink-950 flex items-center justify-center">
-                <Wallet size={14} className="text-brand-400" />
-                <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-brand-500 ring-2 ring-white" />
-              </span>
-              <span className="text-[1.02rem] tracking-tight">Agent<span className="text-brand-500">Mint</span></span>
+            <Link href="/build" className="flex items-center gap-2.5 font-bold text-ink-50">
+              <span className="w-3 h-3 bg-saf-500 shadow-[0_0_14px_#FF7A1A]" />
+              <span className="text-[15px] tracking-tight">AgentMint</span>
             </Link>
-            <Badge>Builder console</Badge>
+            <span className="hidden md:inline font-mono text-[10px] uppercase tracking-[.14em] px-2 py-0.5 border border-saf-500/30 text-saf-500">Builder console</span>
           </div>
 
           <div className="flex items-center gap-1">
-            <Link
-              href="/dashboard"
-              className="hidden sm:inline-flex items-center gap-1.5 text-[12.5px] font-medium text-ink-600 hover:text-ink-950 px-3 py-1.5 rounded-md hover:bg-ink-50"
-              title="See what your customers see"
-            >
-              <PlugZap size={13} /> Customer demo
+            <Link href="/dashboard" className="hidden sm:inline-flex items-center gap-1.5 font-mono text-[11.5px] text-ink-50/55 hover:text-saf-500 px-3 py-1.5">
+              <PlugZap size={12} /> Customer demo
             </Link>
-            <Link
-              href="/build/integration"
-              className="hidden sm:inline-flex items-center gap-1.5 text-[12.5px] font-medium text-ink-600 hover:text-ink-950 px-3 py-1.5 rounded-md hover:bg-ink-50"
-            >
-              <BookOpen size={13} /> Docs
+            <Link href="/build/integration" className="hidden sm:inline-flex items-center gap-1.5 font-mono text-[11.5px] text-ink-50/55 hover:text-saf-500 px-3 py-1.5">
+              <BookOpen size={12} /> Docs
             </Link>
 
-            {/* Account dropdown */}
             <div className="relative">
               <button
                 onClick={() => setUserMenu((m) => !m)}
-                className="inline-flex items-center gap-2 px-2 py-1.5 rounded-lg hover:bg-ink-50 transition"
+                className="inline-flex items-center gap-2 px-2 py-1.5 hover:bg-saf-500/8 transition"
               >
-                <span className="w-7 h-7 rounded-full bg-ink-950 text-brand-400 font-extrabold text-[12px] flex items-center justify-center">
+                <span className="w-7 h-7 bg-saf-500 text-ink-950 font-bold text-[12px] flex items-center justify-center font-mono">
                   {(accountName || 'A').slice(0, 1).toUpperCase()}
                 </span>
-                <span className="hidden sm:inline text-[13px] font-bold text-ink-950 max-w-[160px] truncate">{accountName || 'Account'}</span>
-                <ChevronDown size={12} className="text-ink-500" />
+                <span className="hidden sm:inline text-[13px] font-mono text-ink-50 max-w-[160px] truncate">{accountName || 'Account'}</span>
+                <ChevronDown size={12} className="text-ink-50/50" />
               </button>
               {userMenu && (
                 <>
                   <div className="fixed inset-0 z-10" onClick={() => setUserMenu(false)} />
-                  <div className="absolute right-0 mt-1.5 w-64 rounded-xl bg-white border border-ink-100 shadow-lg z-20 p-1.5">
-                    <div className="px-3 py-2 border-b border-ink-100 mb-1">
-                      <div className="text-[10.5px] uppercase tracking-[.14em] text-ink-400 font-bold">Account</div>
-                      <div className="text-[13px] font-bold text-ink-950 truncate">{accountName ?? '—'}</div>
-                      {accountSlug && <div className="text-[11px] mono text-ink-500 truncate">{accountSlug}</div>}
+                  <div className="absolute right-0 mt-1.5 w-64 bg-ink-800 border border-saf-500/24 shadow-[0_0_50px_rgba(255,122,26,0.08)] z-20 p-1.5">
+                    <div className="px-3 py-2 border-b border-saf-500/14 mb-1">
+                      <div className="font-mono text-[10px] uppercase tracking-[.14em] text-ink-50/45">Account</div>
+                      <div className="text-[13px] font-mono text-ink-50 truncate">{accountName ?? '—'}</div>
+                      {accountSlug && <div className="text-[11px] font-mono text-saf-500 truncate">{accountSlug}</div>}
                     </div>
-                    <MenuItem icon={HelpCircle} href="https://github.com/nagarmohnish/revenue_tech" external>Help &amp; docs</MenuItem>
-                    <button
-                      onClick={signOut}
-                      className="w-full flex items-center gap-2 px-3 py-2 rounded-md text-[13px] text-coral-600 hover:bg-coral-400/10"
-                    >
-                      <LogOut size={13} /> Sign out
+                    <a href="https://github.com/nagarmohnish/revenue_tech" target="_blank" rel="noreferrer" className="flex items-center gap-2 px-3 py-2 text-[13px] font-mono text-ink-50/70 hover:bg-saf-500/8 hover:text-saf-500">
+                      <HelpCircle size={12} /> Help & docs
+                    </a>
+                    <button onClick={signOut} className="w-full flex items-center gap-2 px-3 py-2 text-[13px] font-mono text-saf-500 hover:bg-saf-500/8">
+                      <LogOut size={12} /> Sign out
                     </button>
                   </div>
                 </>
@@ -112,8 +99,7 @@ export function BuilderShell({ children, accountName, accountSlug }: BuilderShel
       </header>
 
       <div className="flex">
-        {/* Sidebar */}
-        <aside className={`${open ? 'flex' : 'hidden'} md:flex flex-col w-60 border-r border-ink-100 bg-white px-3 py-4 fixed md:sticky top-14 h-[calc(100vh-3.5rem)] z-20`}>
+        <aside className={`${open ? 'flex' : 'hidden'} md:flex flex-col w-60 border-r border-saf-500/12 bg-ink-950 px-3 py-4 fixed md:sticky top-14 h-[calc(100vh-3.5rem)] z-20`}>
           <nav className="space-y-0.5 flex-1 overflow-auto">
             {NAV.map((n) => {
               const active = pathname === n.href || (n.href !== '/build' && pathname?.startsWith(n.href));
@@ -122,42 +108,26 @@ export function BuilderShell({ children, accountName, accountSlug }: BuilderShel
                   key={n.href}
                   href={n.href}
                   onClick={() => setOpen(false)}
-                  className={`flex items-center gap-2.5 px-3 py-2 rounded-lg text-[13.5px] font-medium transition ${
-                    active ? 'bg-ink-950 text-white' : 'text-ink-700 hover:bg-ink-50'
+                  className={`flex items-center gap-2.5 px-3 py-2 text-[13px] font-mono transition ${
+                    active ? 'bg-saf-500/12 text-saf-500 border-l-2 border-saf-500' : 'text-ink-50/55 hover:bg-saf-500/6 hover:text-ink-50'
                   }`}
                 >
-                  <n.icon size={15} className={active ? 'text-brand-400' : ''} />
+                  <n.icon size={14} className={active ? '' : ''} />
                   {n.label}
                 </Link>
               );
             })}
           </nav>
 
-          <div className="pt-3 border-t border-ink-100">
-            <Link href="/" className="flex items-center gap-2 px-3 py-2 rounded-lg text-[12px] text-ink-500 hover:text-ink-950 hover:bg-ink-50">
-              <ExternalLink size={12} /> Back to AgentMint
+          <div className="pt-3 border-t border-saf-500/12">
+            <Link href="/" className="flex items-center gap-2 px-3 py-2 text-[11px] font-mono text-ink-50/45 hover:text-saf-500">
+              <ExternalLink size={11} /> Back to AgentMint
             </Link>
           </div>
         </aside>
 
-        {/* Main */}
-        <main className="flex-1 min-w-0 px-5 md:px-8 lg:px-10 py-7 md:py-8 max-w-6xl w-full mx-auto">{children}</main>
+        <main className="flex-1 min-w-0 px-5 md:px-8 lg:px-10 py-8 md:py-10 max-w-6xl w-full mx-auto">{children}</main>
       </div>
     </div>
   );
-}
-
-function Badge({ children }: { children: ReactNode }) {
-  return (
-    <span className="hidden md:inline-flex items-center px-2 py-0.5 rounded-md bg-brand-50 text-brand-700 text-[10px] font-bold uppercase tracking-[.06em]">{children}</span>
-  );
-}
-
-function MenuItem({ icon: Icon, href, external, children }: { icon: any; href?: string; external?: boolean; children: ReactNode }) {
-  const cls = 'flex items-center gap-2 px-3 py-2 rounded-md text-[13px] text-ink-700 hover:bg-ink-50 hover:text-ink-950';
-  if (external && href) {
-    return <a href={href} target="_blank" rel="noreferrer" className={cls}><Icon size={13} /> {children}</a>;
-  }
-  if (href) return <Link href={href} className={cls}><Icon size={13} /> {children}</Link>;
-  return <div className={cls}><Icon size={13} /> {children}</div>;
 }
