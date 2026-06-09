@@ -1,5 +1,14 @@
 import { supabaseAdmin, supabaseConfigured } from '../supabase';
 import type { ApplicationInput, ApplicationRecord } from './types';
+import type { MonetizationPlan } from './planTypes';
+
+export type PlanStatus = 'pending' | 'ready' | 'failed' | 'template';
+
+export interface ApplicationWithPlan extends ApplicationRecord {
+  plan?: MonetizationPlan;
+  planStatus: PlanStatus;
+  planAt?: string | null;
+}
 
 interface SaveMeta {
   userAgent?: string;
@@ -36,7 +45,7 @@ export async function saveApplication(input: ApplicationInput, meta: SaveMeta = 
   return { id: data.id };
 }
 
-export async function loadApplication(id: string): Promise<ApplicationRecord | null> {
+export async function loadApplication(id: string): Promise<ApplicationWithPlan | null> {
   if (!supabaseConfigured()) return null;
   if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id)) return null;
   const sb = supabaseAdmin();
@@ -46,7 +55,21 @@ export async function loadApplication(id: string): Promise<ApplicationRecord | n
     .eq('id', id)
     .single();
   if (error || !data) return null;
-  return rowToRecord(data);
+  return rowToRecordWithPlan(data);
+}
+
+export async function savePlan(
+  id: string,
+  plan: MonetizationPlan,
+  status: PlanStatus = 'ready',
+): Promise<void> {
+  if (!supabaseConfigured()) return;
+  const sb = supabaseAdmin();
+  await sb.from('applications').update({
+    plan,
+    plan_status: plan.generatedBy === 'template' ? 'template' : status,
+    plan_at: new Date().toISOString(),
+  }).eq('id', id);
 }
 
 export async function listApplications(limit = 100): Promise<ApplicationRecord[]> {
@@ -84,5 +107,14 @@ function rowToRecord(row: any): ApplicationRecord {
     createdAt:      row.created_at,
     updatedAt:      row.updated_at,
     contactedAt:    row.contacted_at,
+  };
+}
+
+function rowToRecordWithPlan(row: any): ApplicationWithPlan {
+  return {
+    ...rowToRecord(row),
+    plan:       row.plan ?? undefined,
+    planStatus: row.plan_status ?? 'pending',
+    planAt:     row.plan_at ?? null,
   };
 }

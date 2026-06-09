@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   ArrowLeft, ArrowRight, User, Bot, Wallet, Receipt, Layers, Code2, Calendar,
   Globe, Sparkles, ShieldCheck, Check, Loader2,
@@ -27,12 +27,30 @@ const DEFAULTS: ApplicationInput = {
   notes: '',
 };
 
+const LOADER_STEPS = [
+  'Saving your application…',
+  'Routing to the strategist…',
+  'Reading what your agent does…',
+  'Picking a billing model that fits…',
+  'Drafting three pricing tiers…',
+  'Projecting your revenue at this volume…',
+  'Generating your integration code…',
+  'Wrapping up the plan…',
+];
+
 export default function ApplyPage() {
   const router = useRouter();
   const [form, setForm]       = useState<ApplicationInput>(DEFAULTS);
   const [loading, setLoading] = useState(false);
   const [error, setError]     = useState<string | null>(null);
   const [field, setField]     = useState<string | null>(null);
+  const [loaderIdx, setLoaderIdx] = useState(0);
+
+  useEffect(() => {
+    if (!loading) { setLoaderIdx(0); return; }
+    const id = window.setInterval(() => setLoaderIdx((i) => Math.min(i + 1, LOADER_STEPS.length - 1)), 1600);
+    return () => window.clearInterval(id);
+  }, [loading]);
 
   function set<K extends keyof ApplicationInput>(k: K, v: ApplicationInput[K]) {
     setForm((f) => ({ ...f, [k]: v }));
@@ -82,22 +100,51 @@ export default function ApplyPage() {
 
       <main className="wrap py-12 md:py-16 max-w-3xl">
 
+        {loading && (
+          <div className="fixed inset-0 z-40 bg-white/95 backdrop-blur flex items-center justify-center p-6">
+            <div className="max-w-md w-full text-center">
+              <Loader2 size={36} className="text-brand-500 animate-spin mx-auto" strokeWidth={2.2} />
+              <h2 className="mt-6 font-extrabold text-[1.7rem] tracking-tight text-ink-950 leading-tight">
+                Generating your <span className="text-brand-500">Monetization Plan</span>.
+              </h2>
+              <p className="mt-3 text-[14px] text-ink-600 leading-relaxed">
+                We're scoping a real billing model, three pricing tiers and revenue projections for <strong className="text-ink-950">{form.agentName || 'your agent'}</strong>. Takes about 10 seconds.
+              </p>
+
+              <div className="mt-8 text-left bg-white border border-ink-100 rounded-xl p-4 space-y-1.5">
+                {LOADER_STEPS.map((step, i) => (
+                  <div key={i} className={`flex items-center gap-2.5 text-[13px] transition ${i < loaderIdx ? 'text-ink-700' : i === loaderIdx ? 'text-ink-950 font-bold' : 'text-ink-400'}`}>
+                    {i < loaderIdx ? (
+                      <Check size={13} className="text-brand-600 flex-shrink-0" strokeWidth={3} />
+                    ) : i === loaderIdx ? (
+                      <Loader2 size={13} className="text-brand-500 animate-spin flex-shrink-0" />
+                    ) : (
+                      <span className="w-[13px] h-[13px] rounded-full border border-ink-300 flex-shrink-0" />
+                    )}
+                    <span>{step}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Hero */}
         <section className="reveal">
           <div className="inline-flex items-center gap-2 text-[12px] uppercase tracking-[.14em] font-bold text-brand-700">
-            <Sparkles size={12} /> Concierge intake
+            <Sparkles size={12} /> Instant monetization plan
           </div>
           <h1 className="mt-4 font-extrabold tracking-[-0.028em] leading-[1.04] text-[2.4rem] md:text-[3rem]">
-            Tell us about your agent. <span className="text-brand-500">We build the billing.</span>
+            Tell us about your agent. <span className="text-brand-500">Get a real plan in 10 seconds.</span>
           </h1>
           <p className="mt-4 text-[1.05rem] text-ink-600 leading-relaxed max-w-2xl">
-            Five minutes of writing. One business day until we reply. We scope the monetization layer for your agent — billing model, pricing, payment rail — and ship it for you to review.
+            Five minutes of writing. Then we generate — live — a personalized monetization plan with a recommended billing model, three pricing tiers, revenue projections at your volume, and integration code ready to paste. No call needed.
           </p>
 
           <div className="mt-6 flex flex-wrap items-center gap-x-5 gap-y-2 text-[13px] text-ink-600">
+            <span className="inline-flex items-center gap-1.5"><ShieldCheck size={14} className="text-brand-600" /> Shareable URL</span>
             <span className="inline-flex items-center gap-1.5"><ShieldCheck size={14} className="text-brand-600" /> No commitments</span>
-            <span className="inline-flex items-center gap-1.5"><ShieldCheck size={14} className="text-brand-600" /> $0 while we build it</span>
-            <span className="inline-flex items-center gap-1.5"><ShieldCheck size={14} className="text-brand-600" /> Walk away anytime</span>
+            <span className="inline-flex items-center gap-1.5"><ShieldCheck size={14} className="text-brand-600" /> $0 to use it</span>
           </div>
         </section>
 

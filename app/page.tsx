@@ -57,11 +57,11 @@ const SOLUTIONS_STAGE = [
 ];
 
 const RESOURCES_MENU = [
-  { title: 'StackScore (free tool)', desc: 'Test any payment funnel end-to-end', href: '/stackscore' },
-  { title: 'Documentation',          desc: 'authorize() · debit() · invoices · webhooks', href: '#' },
-  { title: 'Pricing',                desc: 'Three plans, $0 for the pilot cohort', href: '#pricing' },
-  { title: 'GitHub',                 desc: 'github.com/nagarmohnish/revenue_tech', href: 'https://github.com/nagarmohnish/revenue_tech' },
-  { title: 'Strategy memo',          desc: 'Why a single dashboard wins multi-agent', href: '#' },
+  { title: 'Free Pricing Audit',       desc: 'Domain → competitive read + branded PDF',     href: '/audit' },
+  { title: 'Deep Monetization Roadmap', desc: 'For companies with multiple agents + clients', href: '/roadmap' },
+  { title: 'StackScore (funnel walker)', desc: 'Walk any checkout end-to-end',               href: '/stackscore' },
+  { title: 'Concierge intake',          desc: 'Tell us about your agent · instant plan',     href: '/apply' },
+  { title: 'GitHub',                    desc: 'github.com/nagarmohnish/revenue_tech',        href: 'https://github.com/nagarmohnish/revenue_tech' },
 ];
 
 const SDK_TABS = [
