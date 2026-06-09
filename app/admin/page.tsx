@@ -2,7 +2,10 @@
 
 import { useEffect, useState } from 'react';
 import { AppShell } from '@/components/AppShell';
-import { Lock, Shield } from 'lucide-react';
+import {
+  Button, Card, EmptyState, PageHeader, Eyebrow, Badge, Field, Input, InfoBanner, Stat,
+} from '@/components/ui';
+import { Lock, Shield, Users } from 'lucide-react';
 
 interface Row {
   id: string;
@@ -31,8 +34,7 @@ export default function AdminPage() {
   }, []);
 
   async function load(s = secret) {
-    setLoading(true);
-    setError(null);
+    setLoading(true); setError(null);
     try {
       const res = await fetch('/api/v1/admin/workspaces', { headers: { 'x-admin-secret': s } });
       const data = await res.json();
@@ -46,67 +48,87 @@ export default function AdminPage() {
     }
   }
 
+  const totalBalance = rows?.reduce((acc, r) => acc + r.balance, 0) ?? 0;
+  const activeCount = rows?.filter((r) => r.lastActive && Date.now() - new Date(r.lastActive).getTime() < 7 * 24 * 60 * 60 * 1000).length ?? 0;
+
   return (
     <AppShell admin>
-      <div className="flex items-center justify-between">
-        <div>
-          <div className="text-xs text-ink-400 uppercase tracking-wider">Internal</div>
-          <h1 className="text-2xl font-semibold tracking-tight text-ink-900 flex items-center gap-2"><Shield size={20} /> Admin</h1>
-          <p className="text-sm text-ink-500 mt-1">All workspaces · balance · plan · last active.</p>
-        </div>
-      </div>
+      <PageHeader
+        eyebrow={<Eyebrow icon={<Shield size={11} />}>Internal</Eyebrow>}
+        title="Admin"
+        description="Every workspace · plan · balance · last active. Read-only."
+      />
 
-      {!rows && (
-        <div className="mt-6 card p-5 max-w-md">
-          <label className="block text-xs font-medium text-ink-500 mb-1.5 flex items-center gap-1"><Lock size={12} /> ADMIN_SECRET_KEY</label>
-          <div className="flex gap-2">
-            <input
-              type="password"
-              value={secret}
-              onChange={(e) => setSecret(e.target.value)}
-              placeholder="Set this in .env.local"
-              className="field"
-            />
-            <button disabled={!secret || loading} onClick={() => load()} className="btn-primary">
-              {loading ? 'Loading…' : 'Unlock'}
-            </button>
+      {!rows ? (
+        <Card padding="lg" className="mt-8 max-w-md">
+          <div className="flex items-center gap-2.5">
+            <span className="w-10 h-10 rounded-xl bg-ink-950 text-brand-400 flex items-center justify-center">
+              <Lock size={18} />
+            </span>
+            <div>
+              <h2 className="font-extrabold text-ink-950 tracking-tight">Locked</h2>
+              <p className="text-[12.5px] text-ink-500">Enter <code className="mono">ADMIN_SECRET_KEY</code> to view workspaces.</p>
+            </div>
           </div>
-          {error && <div className="mt-3 text-sm text-bad">{error}</div>}
-        </div>
-      )}
 
-      {rows && (
-        <section className="mt-6 card overflow-hidden">
-          <table className="w-full text-sm">
-            <thead className="bg-ink-50 text-ink-500 text-xs uppercase tracking-wider">
-              <tr>
-                <th className="text-left px-4 py-2.5 font-medium">Workspace</th>
-                <th className="text-left px-4 py-2.5 font-medium">Owner</th>
-                <th className="text-left px-4 py-2.5 font-medium">Plan</th>
-                <th className="text-right px-4 py-2.5 font-medium">Balance</th>
-                <th className="text-left px-4 py-2.5 font-medium">Last active</th>
-                <th className="text-left px-4 py-2.5 font-medium">Created</th>
-              </tr>
-            </thead>
-            <tbody>
-              {rows.map((r) => (
-                <tr key={r.id} className="border-t border-ink-100">
-                  <td className="px-4 py-2.5 text-ink-900 font-medium">{r.name}</td>
-                  <td className="px-4 py-2.5 text-ink-500">{r.owner?.email || '-'}</td>
-                  <td className="px-4 py-2.5"><span className="tag tag-muted capitalize">{r.plan}</span></td>
-                  <td className="px-4 py-2.5 text-right font-mono">{r.balance.toLocaleString()}</td>
-                  <td className="px-4 py-2.5 text-ink-500">{r.lastActive ? new Date(r.lastActive).toLocaleString() : '-'}</td>
-                  <td className="px-4 py-2.5 text-ink-500">{new Date(r.created_at).toLocaleDateString()}</td>
-                </tr>
-              ))}
-              {rows.length === 0 && (
-                <tr>
-                  <td colSpan={6} className="px-4 py-8 text-center text-ink-500">No workspaces yet.</td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </section>
+          <form
+            onSubmit={(e) => { e.preventDefault(); if (secret) load(); }}
+            className="mt-5 space-y-3"
+          >
+            <Field label="Secret">
+              <Input type="password" value={secret} onChange={(e) => setSecret(e.target.value)} placeholder="set in .env.local" />
+            </Field>
+            <Button type="submit" disabled={!secret} loading={loading} fullWidth>
+              {loading ? 'Loading…' : 'Unlock'}
+            </Button>
+            {error && <InfoBanner tone="error">{error}</InfoBanner>}
+          </form>
+        </Card>
+      ) : (
+        <>
+          <section className="mt-8 grid sm:grid-cols-3 gap-3">
+            <Stat label="Workspaces" value={rows.length} icon={<Users size={16} />} />
+            <Stat label="Active this week" value={activeCount} hint={rows.length ? `${Math.round((activeCount / rows.length) * 100)}% of total` : undefined} />
+            <Stat label="Credits in circulation" value={totalBalance.toLocaleString()} hint="across all wallets" />
+          </section>
+
+          <Card padding="none" className="mt-6 overflow-hidden">
+            {rows.length === 0 ? (
+              <div className="p-12">
+                <EmptyState
+                  icon={<Users size={24} />}
+                  title="No workspaces yet"
+                  body="Customers who sign up at /login will show up here."
+                />
+              </div>
+            ) : (
+              <table className="w-full text-[13.5px]">
+                <thead className="bg-ink-50">
+                  <tr className="text-[10.5px] uppercase tracking-[.12em] text-ink-500 font-bold">
+                    <th className="text-left px-4 py-3">Workspace</th>
+                    <th className="text-left px-4 py-3">Owner</th>
+                    <th className="text-left px-4 py-3">Plan</th>
+                    <th className="text-right px-4 py-3">Balance</th>
+                    <th className="text-left px-4 py-3">Last active</th>
+                    <th className="text-left px-4 py-3">Created</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {rows.map((r) => (
+                    <tr key={r.id} className="border-t border-ink-100 hover:bg-ink-50/40">
+                      <td className="px-4 py-3 text-ink-950 font-bold">{r.name}</td>
+                      <td className="px-4 py-3 text-ink-500 mono text-[12.5px]">{r.owner?.email || '—'}</td>
+                      <td className="px-4 py-3"><Badge tone="neutral" className="capitalize">{r.plan}</Badge></td>
+                      <td className="px-4 py-3 text-right font-mono tnum font-bold text-ink-950">{r.balance.toLocaleString()}</td>
+                      <td className="px-4 py-3 text-ink-500 mono text-[12px]">{r.lastActive ? new Date(r.lastActive).toLocaleString() : '—'}</td>
+                      <td className="px-4 py-3 text-ink-500 mono text-[12px]">{new Date(r.created_at).toLocaleDateString()}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+          </Card>
+        </>
       )}
     </AppShell>
   );

@@ -3,8 +3,9 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Logo } from '@/components/Logo';
-import { ArrowRight, Mail } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Mail, Check } from 'lucide-react';
+import { AuthShell } from '@/components/AuthShell';
+import { Button, Field, Input, InfoBanner } from '@/components/ui';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -34,55 +35,60 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-ink-50 flex flex-col">
-      <header className="px-6 h-14 flex items-center border-b border-ink-100 bg-white">
-        <Logo />
-      </header>
-      <main className="flex-1 flex items-center justify-center px-6 py-12">
-        <div className="w-full max-w-md card p-7">
-          <h1 className="text-xl font-semibold text-ink-900 tracking-tight">Sign in to AgentMint</h1>
-          <p className="mt-1.5 text-sm text-ink-500">
-            New here? We'll create your workspace and drop 100 trial credits in your wallet.
-          </p>
+    <AuthShell
+      title={<>Sign in to <span className="text-brand-500">AgentMint</span></>}
+      description="New here? We'll create your workspace and drop 100 trial credits in your wallet."
+      rightPanel={<RightPanel />}
+    >
+      <form onSubmit={submit} className="space-y-4">
+        <Field label="Email" required>
+          <Input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@company.com" />
+        </Field>
+        <Field label="Name (optional)">
+          <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="Mohnish" />
+        </Field>
+        {err && <InfoBanner tone="error">{err}</InfoBanner>}
+        <Button type="submit" loading={loading} fullWidth iconLeft={<Mail size={14} />} iconRight={<ArrowRight size={14} />}>
+          {loading ? 'Signing in…' : 'Continue with email'}
+        </Button>
+      </form>
 
-          <form onSubmit={submit} className="mt-6 space-y-3">
+      <p className="mt-6 text-[12px] text-ink-400 leading-relaxed">
+        MVP uses a signed-cookie session. Google OAuth via Better Auth is wired in <code className="mono">lib/auth.ts</code> and ready to swap once <code className="mono">GOOGLE_CLIENT_ID</code> is set.
+      </p>
+
+      <div className="mt-7 pt-5 border-t border-ink-100">
+        <Link href="/" className="inline-flex items-center gap-1.5 text-[13px] text-ink-500 hover:text-ink-900">
+          <ArrowLeft size={12} /> Back to home
+        </Link>
+      </div>
+    </AuthShell>
+  );
+}
+
+function RightPanel() {
+  const items = [
+    ['One wallet across every agent', '100 trial credits when you sign up.'],
+    ['No card required', 'Top up when you find value. Cancel anytime.'],
+    ['Real agents, not demos', 'Scanner / Writer / Studio all available.'],
+  ];
+  return (
+    <div>
+      <div className="text-[11px] uppercase tracking-[.14em] font-bold text-brand-700">What you'll see</div>
+      <h2 className="mt-3 font-extrabold text-[1.6rem] tracking-tight text-ink-950 leading-tight">A real wallet with real agents.</h2>
+      <ul className="mt-7 space-y-5">
+        {items.map(([t, sub]) => (
+          <li key={t} className="flex gap-3 items-start">
+            <span className="w-7 h-7 rounded-lg bg-brand-500/10 text-brand-700 flex items-center justify-center flex-shrink-0">
+              <Check size={14} strokeWidth={2.6} />
+            </span>
             <div>
-              <label className="block text-xs font-medium text-ink-500 mb-1">Email</label>
-              <input
-                type="email"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="you@company.com"
-                className="field"
-              />
+              <div className="font-bold text-ink-950">{t}</div>
+              <div className="text-[13px] text-ink-500 mt-0.5">{sub}</div>
             </div>
-            <div>
-              <label className="block text-xs font-medium text-ink-500 mb-1">Name <span className="text-ink-400">(optional)</span></label>
-              <input
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="Mohnish"
-                className="field"
-              />
-            </div>
-            {err && <div className="text-sm text-bad bg-red-50 border border-red-100 rounded-md px-3 py-2">{err}</div>}
-            <button disabled={loading} className="btn-primary w-full justify-center">
-              {loading ? 'Signing in…' : (<><Mail size={16} /> Continue with email <ArrowRight size={14} /></>)}
-            </button>
-          </form>
-
-          <div className="mt-6 text-xs text-ink-400 leading-relaxed">
-            By signing in you agree to our terms. This MVP uses a magic-cookie session - Google OAuth via Better Auth
-            is wired in <span className="font-mono">lib/auth.ts</span> and ready to swap in once
-            <span className="font-mono"> GOOGLE_CLIENT_ID</span> is set.
-          </div>
-
-          <div className="mt-6 pt-5 border-t border-ink-100 text-sm">
-            <Link href="/" className="text-ink-500 hover:text-ink-900">← Back to home</Link>
-          </div>
-        </div>
-      </main>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }

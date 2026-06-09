@@ -9,6 +9,21 @@ Reverse-chronological log of meaningful changes. Each entry:
 
 ---
 
+## 2026-06-10 · Design system + product-surface refresh (Phase 1)
+
+Shipped `components/ui/` — a real design system replacing the ad-hoc utility classes scattered through pages. Five themed files: `buttons.tsx`, `cards.tsx`, `forms.tsx`, `layout.tsx`, plus an `index.ts` re-export. Primitives: `Button`, `LinkButton`, `IconButton`, `Card`, `Stat`, `EmptyState`, `InfoBanner`, `Field`, `Input`, `Textarea`, `Select`, `InputGroup`, `RadioCardGrid`, `Toggle`, `Eyebrow`, `PageHeader`, `SectionHeader`, `Badge`, `Tabs`, `CodeBlock`, `Spinner`, `Kbd`.
+
+Three shells modernized:
+- `BuilderShell` — sticky top bar with account dropdown · collapsible sidebar with brand-accent active state · responsive mobile drawer.
+- `AppShell` — sticky top bar with wallet balance pill + workspace dropdown · secondary underline-tab nav with mobile drawer.
+- `AuthShell` (new) — two-column layout for login/signup pages.
+
+Refactored screens (Phase 1 — highest-traffic): `/build`, `/dashboard`, `/login`, `/build/signup`, `/admin`. Each gets PageHeader + Eyebrow + Card primitives, consistent spacing, lucide icons throughout.
+
+Remaining screens (Phase 2 — queued in ROADMAP.md): `/build/agents`, `/build/api-keys`, `/build/integration`, `/build/plans`, `/build/revenue`, `/build/stripe`, `/build/login`, `/agents/*` (4), `/billing/*` (4). They continue to render correctly with the existing globals.css `.card`/`.btn` utilities — they just don't yet use the new typed primitives.
+
+---
+
 ## 2026-06-10 · Product vision reframe — "AI agents for revenue/retention optimization"
 
 User-driven scope expansion: AgentMint isn't just billing for AI agents — it's a *suite* of AI-powered automated agents, each targeting a specific revenue/retention surface (cart recovery, upgrade campaigns, churn saves, failed-payment recovery, annual conversion, etc.). Memorialized in [VISION.md](VISION.md) with the agent suite enumerated, build sequencing, competitive reference points (Recurly, Stripe, Razorpay), and explicit non-goals.

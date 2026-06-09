@@ -6,6 +6,18 @@ What we plan to build, what we deferred, what we've ruled out.
 
 ## Next iteration (immediate)
 
+### Design system rollout — Phase 2
+
+Phase 1 (2026-06-10) shipped `components/ui/` primitives + 3 modernized shells + refactored `/build`, `/dashboard`, `/login`, `/build/signup`, `/admin`. Phase 2 refactors the remaining product screens to consume the same primitives:
+
+- **Builder console** — `/build/agents`, `/build/api-keys`, `/build/integration`, `/build/plans`, `/build/revenue`, `/build/stripe`, `/build/login`.
+- **Customer surface** — `/agents/scanner`, `/agents/blog-writer`, `/agents/content-studio`, `/agents/locked`.
+- **Billing portal** — `/billing`, `/billing/upgrade`, `/billing/topup`, `/billing/success`.
+
+Each refactor follows the same recipe: wrap with the right Shell, use `PageHeader` + `SectionHeader`, swap `.card`/`.btn` for `Card`/`Button`, swap `.field` inputs for `Field` + `Input`/`Textarea`/`Select`. Logic stays the same; only chrome changes.
+
+
+
 ### Deep Roadmap (Tool 2) — analysis pipeline
 
 The form ships in this iteration; the analysis pipeline is the obvious next step. Spec:
