@@ -4,7 +4,7 @@
 // Strategy: rank visible clickables by (intent match × prominence). Higher-
 // intent text wins over a bigger button with neutral text.
 
-import type { Page, Locator } from 'playwright-core';
+import type { Page, Locator } from 'playwright';
 import type { StepClass } from './types.js';
 
 interface CtaCandidate {

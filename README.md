@@ -153,6 +153,25 @@ export async function POST(req: Request) {
 
 Add a registry row to `tool_registry` (see `supabase/migrations/0001_init.sql` for the seed pattern).
 
+## Concierge intake (MVP path)
+
+`/apply` is the front door for builders who'd rather we wire the monetization layer than do it themselves. It's the working-prototype validation pattern — let real humans handle the bespoke work in the background until the demand signal is clear.
+
+| Concern | Where |
+|---|---|
+| Public intake form | `app/apply/page.tsx` |
+| Confirmation + reference page | `app/apply/thanks/[id]/page.tsx` |
+| POST API | `app/api/apply/route.ts` |
+| Types + zod validation | `lib/applications/types.ts`, `lib/applications/validate.ts` |
+| Supabase store | `lib/applications/store.ts`, migration `supabase/migrations/0004_applications.sql` |
+| Resend notifications (applicant + team) | `lib/applications/notify.ts` |
+
+The form captures: name + email + company, agent name + description + lifecycle + volume estimate, billing preference (prepaid / usage / both / not sure), geography (USD / INR / both / other), stack, timeline, free-text notes. Status pipeline: `new → contacted → scoping → building → live` (or `declined`).
+
+**Before first use:** apply `supabase/migrations/0004_applications.sql` in the Supabase SQL editor. Email notifications are optional — set `RESEND_API_KEY` + `APPLICATIONS_INBOX` (or rely on `RESEND_FROM_EMAIL`) and they'll fire; otherwise the form still saves silently.
+
+**Reviewing applications** (for now): run `select * from applications order by created_at desc;` in the Supabase SQL editor. A proper `/admin/applications` surface is a follow-up.
+
 ## Bundled tools
 
 ### StackScore — payment-funnel walker (`/stackscore`)

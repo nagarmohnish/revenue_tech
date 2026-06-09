@@ -2,7 +2,7 @@
 // clicking the most purchase-intent CTA on each page. Stops when a terminal
 // condition is hit. Returns a fully-typed WalkResponse.
 
-import { chromium, Browser } from 'playwright-core';
+import { chromium, Browser } from 'playwright';
 import { extractSignals } from './signals.js';
 import { pickPrimaryCta } from './cta.js';
 import { classify } from './classify.js';
@@ -52,6 +52,14 @@ export async function walk(rawUrl: string, maxSteps: number): Promise<WalkRespon
     });
     ctx.setDefaultNavigationTimeout(NAV_TIMEOUT_MS);
     ctx.setDefaultTimeout(NAV_TIMEOUT_MS);
+
+    // tsx/esbuild injects __name() into compiled functions for stack-trace
+    // naming. That helper doesn't exist in the browser context, so any
+    // page.evaluate() that touches a named function ReferenceErrors.
+    // Inject a no-op polyfill as a raw string so tsx itself doesn't transform it.
+    await ctx.addInitScript({
+      content: 'if(typeof globalThis.__name!=="function"){globalThis.__name=function(f){return f;};}',
+    });
 
     const page = await ctx.newPage();
     const steps: FlowStep[] = [];

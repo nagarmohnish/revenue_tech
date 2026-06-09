@@ -10,3 +10,4 @@ next-env.d.ts
 
 # strategy/PRD docs excluded from public history
 docs/
+.claude/

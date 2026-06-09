@@ -1,7 +1,7 @@
 // Runs inside the browser context via page.evaluate.
 // Returns StepSignals for the current page.
 
-import type { Page } from 'playwright-core';
+import type { Page } from 'playwright';
 import type { StepSignals } from './types.js';
 
 export async function extractSignals(page: Page, loadTimeMs: number): Promise<StepSignals> {
